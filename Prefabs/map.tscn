@@ -1,0 +1,38 @@
+[gd_scene load_steps=18 format=3 uid="uid://b4tmghst4yfag"]
+
+[ext_resource type="Script" path="res://Scripts/Map.cs" id="1_1bee2"]
+[ext_resource type="Texture2D" uid="uid://dt0rworoos2g2" path="res://Arts/Sprites/Sprite_03.png" id="2_kqkvv"]
+[ext_resource type="Texture2D" uid="uid://bnntlw5tlg3xn" path="res://Arts/Sprites/Sprite_07.png" id="3_ufwe7"]
+[ext_resource type="Texture2D" uid="uid://drdug36y4agum" path="res://Arts/Sprites/Sprite_15.png" id="4_hticq"]
+[ext_resource type="Texture2D" uid="uid://hrw1vyixk1xa" path="res://Arts/Sprites/Sprite_11.png" id="5_wogvp"]
+[ext_resource type="Texture2D" uid="uid://diatx8casr7ud" path="res://Arts/Sprites/Sprite_01.png" id="6_88qon"]
+[ext_resource type="Texture2D" uid="uid://df7rv4egnygkp" path="res://Arts/Sprites/Sprite_05.png" id="7_g0eij"]
+[ext_resource type="Texture2D" uid="uid://rena618sgh6r" path="res://Arts/Sprites/Sprite_09.png" id="8_hvn8k"]
+[ext_resource type="Texture2D" uid="uid://bpjebr730x5c" path="res://Arts/Sprites/Sprite_13.png" id="9_5bg51"]
+[ext_resource type="Texture2D" uid="uid://h36rpj8oct2u" path="res://Arts/Sprites/Sprite_02.png" id="10_ma8mv"]
+[ext_resource type="Texture2D" uid="uid://bolq6os0cmx0g" path="res://Arts/Sprites/Sprite_06.png" id="11_urfam"]
+[ext_resource type="Texture2D" uid="uid://o55pfry4rwqf" path="res://Arts/Sprites/Sprite_10.png" id="12_s2ner"]
+[ext_resource type="Texture2D" uid="uid://b3c3ciwoam368" path="res://Arts/Sprites/Sprite_14.png" id="13_widnh"]
+[ext_resource type="Texture2D" uid="uid://3ev1gxjje0j8" path="res://Arts/Sprites/Sprite_00.png" id="14_rwly8"]
+[ext_resource type="Texture2D" uid="uid://be66adtq2vqw0" path="res://Arts/Sprites/Sprite_04.png" id="15_tnyg2"]
+[ext_resource type="Texture2D" uid="uid://bpofn5sc3qdnw" path="res://Arts/Sprites/Sprite_08.png" id="16_uj6cn"]
+[ext_resource type="Texture2D" uid="uid://b8kopjdfqou4v" path="res://Arts/Sprites/Sprite_12.png" id="17_rets3"]
+
+[node name="Map" type="Node2D"]
+script = ExtResource("1_1bee2")
+stoneSprite = ExtResource("2_kqkvv")
+depositSprite = ExtResource("3_ufwe7")
+mineralSprite = ExtResource("4_hticq")
+bedrockSprite = ExtResource("5_wogvp")
+fighterBotRedSprite = ExtResource("6_88qon")
+fighterBotGreenSprite = ExtResource("7_g0eij")
+fighterBotPurpleSprite = ExtResource("8_hvn8k")
+fighterBotCyanSprite = ExtResource("9_5bg51")
+minerBotRedSprite = ExtResource("10_ma8mv")
+minerBotGreenSprite = ExtResource("11_urfam")
+minerBotPurpleSprite = ExtResource("12_s2ner")
+minerBotCyanSprite = ExtResource("13_widnh")
+motherShipRedSprite = ExtResource("14_rwly8")
+motherShipGreenSprite = ExtResource("15_tnyg2")
+motherShipPurpleSprite = ExtResource("16_uj6cn")
+motherShipCyanSprite = ExtResource("17_rets3")

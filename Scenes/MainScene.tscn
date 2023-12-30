@@ -1,0 +1,21 @@
+[gd_scene load_steps=6 format=3 uid="uid://c5foxt87rn5h8"]
+
+[ext_resource type="PackedScene" uid="uid://b4tmghst4yfag" path="res://Prefabs/map.tscn" id="1_62bva"]
+[ext_resource type="PackedScene" uid="uid://bo3atljy2rlbm" path="res://Prefabs/mined.tscn" id="1_hlayu"]
+[ext_resource type="PackedScene" uid="uid://c3vhjegq0oxum" path="res://Prefabs/game_controller.tscn" id="2_nmr2j"]
+[ext_resource type="PackedScene" uid="uid://ddq0p0md7edh5" path="res://Prefabs/empty_sprite.tscn" id="2_ugsre"]
+[ext_resource type="PackedScene" uid="uid://00j3m38tdrds" path="res://Prefabs/explosion.tscn" id="8_7nu0n"]
+
+[node name="World" type="Node2D"]
+
+[node name="Map" parent="." instance=ExtResource("1_62bva")]
+emptySpritePrefab = ExtResource("2_ugsre")
+explosionPrefab = ExtResource("8_7nu0n")
+minedPrefab = ExtResource("1_hlayu")
+
+[node name="GameController" parent="." instance=ExtResource("2_nmr2j")]
+frameRate = 120
+mapWidth = 150
+mapHeight = 150
+playerStartPositions = Array[Vector2]([Vector2(3, 3), Vector2(-3, -3), Vector2(3, -3), Vector2(-3, 3)])
+playerAgents = Array[int]([0, 0, 0, 0])

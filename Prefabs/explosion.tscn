@@ -1,0 +1,18 @@
+[gd_scene load_steps=11 format=3 uid="uid://00j3m38tdrds"]
+
+[ext_resource type="Texture2D" uid="uid://ctgkhcaj1deiw" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion00.png" id="1_l2chg"]
+[ext_resource type="Script" path="res://Scripts/Anim.cs" id="1_ymlxf"]
+[ext_resource type="Texture2D" uid="uid://d2m6ix8t5h3i1" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion01.png" id="3_kudgq"]
+[ext_resource type="Texture2D" uid="uid://d1wxwt1db6tsw" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion02.png" id="4_sgpeb"]
+[ext_resource type="Texture2D" uid="uid://b5f5p3163yhg" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion03.png" id="5_dtqt1"]
+[ext_resource type="Texture2D" uid="uid://b8t2lnrh4kxrc" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion04.png" id="6_kprsa"]
+[ext_resource type="Texture2D" uid="uid://b1p2di10yv01b" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion05.png" id="7_bcx7g"]
+[ext_resource type="Texture2D" uid="uid://s7bk7ajhti50" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion06.png" id="8_k7ywx"]
+[ext_resource type="Texture2D" uid="uid://t0w6tp1npfnu" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion07.png" id="9_whmkj"]
+[ext_resource type="Texture2D" uid="uid://v3jbggn5pt37" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion08.png" id="10_1jt6v"]
+
+[node name="Explosion" type="Sprite2D"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_l2chg")
+script = ExtResource("1_ymlxf")
+sprites = Array[Texture2D]([ExtResource("1_l2chg"), ExtResource("3_kudgq"), ExtResource("4_sgpeb"), ExtResource("5_dtqt1"), ExtResource("6_kprsa"), ExtResource("7_bcx7g"), ExtResource("8_k7ywx"), ExtResource("9_whmkj"), ExtResource("10_1jt6v")])

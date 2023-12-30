@@ -1,0 +1,13 @@
+[gd_scene load_steps=6 format=3 uid="uid://bo3atljy2rlbm"]
+
+[ext_resource type="Script" path="res://Scripts/Anim.cs" id="1_h2jj5"]
+[ext_resource type="Texture2D" uid="uid://b1p2di10yv01b" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion05.png" id="2_guxg1"]
+[ext_resource type="Texture2D" uid="uid://s7bk7ajhti50" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion06.png" id="3_d4ruc"]
+[ext_resource type="Texture2D" uid="uid://t0w6tp1npfnu" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion07.png" id="4_2gtda"]
+[ext_resource type="Texture2D" uid="uid://v3jbggn5pt37" path="res://Arts/Explosion Pack/PNG/Pixel explosion/pixelExplosion08.png" id="5_x1cht"]
+
+[node name="Mined" type="Sprite2D"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_guxg1")
+script = ExtResource("1_h2jj5")
+sprites = Array[Texture2D]([ExtResource("2_guxg1"), ExtResource("3_d4ruc"), ExtResource("4_2gtda"), ExtResource("5_x1cht")])

@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3vhjegq0oxum"]
+
+[ext_resource type="Script" path="res://Scripts/GameController.cs" id="1_wt4ic"]
+
+[node name="GameController" type="Node"]
+script = ExtResource("1_wt4ic")
+playerStartPositions = Array[Vector2]([Vector2(5, 5), Vector2(45, 45)])
+playerAgents = Array[int]([1, 0])

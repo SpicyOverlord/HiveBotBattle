@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c7ech1l4kramu"
-path="res://.godot/imported/yellowCloud4.png-ed7425745533c665b80626bc00e3fb28.ctex"
+path="res://.godot/imported/yellowCloud4.png-ebfe4287862d981af5a370fc2b4cc0d8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Arts/Explosion Pack/PNG/Particles/yellowCloud4.png"
-dest_files=["res://.godot/imported/yellowCloud4.png-ed7425745533c665b80626bc00e3fb28.ctex"]
+source_file="res://Sprites/Explosion Pack/PNG/Particles/yellowCloud4.png"
+dest_files=["res://.godot/imported/yellowCloud4.png-ebfe4287862d981af5a370fc2b4cc0d8.ctex"]
 
 [params]
 

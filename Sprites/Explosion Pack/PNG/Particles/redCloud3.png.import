@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://e374dmwyrdy5"
-path="res://.godot/imported/redCloud3.png-33e855e4bfa003e3c0dc3a4dfc1a58ed.ctex"
+path="res://.godot/imported/redCloud3.png-5abefc1da6c2ea800a42302b08c01f49.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Arts/Explosion Pack/PNG/Particles/redCloud3.png"
-dest_files=["res://.godot/imported/redCloud3.png-33e855e4bfa003e3c0dc3a4dfc1a58ed.ctex"]
+source_file="res://Sprites/Explosion Pack/PNG/Particles/redCloud3.png"
+dest_files=["res://.godot/imported/redCloud3.png-5abefc1da6c2ea800a42302b08c01f49.ctex"]
 
 [params]
 

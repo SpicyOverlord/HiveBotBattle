@@ -18,7 +18,7 @@ namespace AI
         {
             Reset(obs);
 
-            int maxMinerBots = Mathf.Min((4 - obs.GetEnemyCount()) * 5, 15) + 2 * obs.GetMapWidth() / 100;
+            int maxMinerBots = Mathf.Min((4 - obs.GetOpponentCount()) * 5, 15) + 2 * obs.GetMapWidth() / 100;
 
             bool weHaveEnoughMiners = obs.GetFriendlyMinerBotCount() < maxMinerBots;
             bool weShouldBuildMiner = obs.GetDepositPositions().Count != 0 && weHaveEnoughMiners;

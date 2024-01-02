@@ -7,6 +7,9 @@ using static Map;
 namespace HiveBotBattle.Scripts.BSPTree
 {
     public class BSPTree
+    /// <summary>
+    /// Represents a Binary Space Partition (BSP) tree used for spatial partitioning of elements.
+    /// </summary>
     {
         public const int Null = -1;
         public const int Empty = -2;
@@ -20,13 +23,20 @@ namespace HiveBotBattle.Scripts.BSPTree
 
         public readonly ResizingCellArray CellArray;
 
+        /// <summary>
+        /// Initializes a Binary Space Partitioning (BSP) tree used for nearest neighbor search in 2D space.
+        /// </summary>
+        /// <param name="width">The width of the 2D space.</param>
+        /// <param name="height">The height of the 2D space.</param>
+        /// <param name="TreeDepth">The depth of the BSP tree.</param>
         public BSPTree(int width, int height, int TreeDepth)
         {
+            
             ElementIndices = new List<ElementIndex>();
             CellArray = new ResizingCellArray();
             _partitions = new Partition[CalculatePartitionCount(TreeDepth)];
 
-            Bounds2D bounds = new Bounds2D(0,0,width,height);
+            Bounds2D bounds = new Bounds2D(0, 0, width, height);
 
             _partitions[_partitionsLastIndex] = new Partition(bounds);
             _partitionsLastIndex++;
@@ -36,6 +46,12 @@ namespace HiveBotBattle.Scripts.BSPTree
             _leafPartitions = CollectLeafPartitions(TreeDepth);
         }
 
+
+        /// <summary>
+        /// Recursively creates partitions in the binary space partition tree.
+        /// </summary>
+        /// <param name="partitionIndex">The index of the current partition.</param>
+        /// <param name="maxTreeDepth">The maximum depth of the tree.</param>
         private void CreateTreePartitions(int partitionIndex, int maxTreeDepth)
         {
             Partition partition = _partitions[partitionIndex];
@@ -51,6 +67,10 @@ namespace HiveBotBattle.Scripts.BSPTree
             CreateTreePartitions(partition.RightChildIndex, maxTreeDepth);
             CreateTreePartitions(partition.LeftChildIndex, maxTreeDepth);
         }
+        /// <summary>
+        /// Creates the 2 children partitions for a given partition in the BSP tree.
+        /// </summary>
+        /// <param name="partitionIndex">The index of the partition to create children for.</param>
         private void CreatePartitionChildren(int partitionIndex)
         {
             Partition partition = _partitions[partitionIndex];
@@ -80,11 +100,32 @@ namespace HiveBotBattle.Scripts.BSPTree
             _partitionsLastIndex++;
         }
 
+        /// <summary>
+        /// Calculates the total number of partitions in the BSP tree based on the maximum tree depth.
+        /// </summary>
+        /// <param name="maxTreeDepth">The maximum depth of the tree.</param>
+        /// <returns>The total number of partitions in the BSP tree.</returns>
         public static int CalculatePartitionCount(int maxTreeDepth) => (int)Mathf.Pow(2, maxTreeDepth + 1) - 1;
+
+        /// <summary>
+        /// Calculates the total number of leaf partitions in the BSP tree based on the maximum tree depth.
+        /// </summary>
+        /// <param name="maxTreeDepth">The maximum depth of the tree.</param>
+        /// <returns>The total number of leaf partitions in the BSP tree.</returns>
         public static int CalculateLeafPartitionCount(int maxTreeDepth) => (int)Mathf.Pow(2, maxTreeDepth);
 
+        /// <summary>
+        /// Inserts a cell into the BSP tree.
+        /// </summary>
+        /// <param name="cell">The cell to insert.</param>
         public void Insert(Cell Cell) => Insert(0, Cell);
 
+
+        /// <summary>
+        /// Inserts a cell into a specific partition in the BSP tree.
+        /// </summary>
+        /// <param name="partitionIndex">The index of the partition to insert the cell into.</param>
+        /// <param name="cell">The cell to be inserted.</param>
         private void Insert(int partitionIndex, Cell cell)
         {
             Partition partition = _partitions[partitionIndex];
@@ -119,6 +160,9 @@ namespace HiveBotBattle.Scripts.BSPTree
             }
         }
 
+        /// <summary>
+        /// Reinserts all cells into the BSP tree and remove destroyed cells from the cell array if needed.
+        /// </summary>
         public void ReinsertAllAndCleanIfNeeded()
         {
             if (CellArray.Count == 0)
@@ -143,6 +187,14 @@ namespace HiveBotBattle.Scripts.BSPTree
             }
         }
 
+        /// <summary>
+        /// Reinserts a cell into a specific partition in the BSPTree.
+        /// If the partition is not a leaf partition, the cell is inserted into the correct child partition based on its position.
+        /// If the partition is a leaf partition, the cell is added to the partition.
+        /// </summary>
+        /// <param name="partitionIndex">The index of the partition.</param>
+        /// <param name="cell">The cell to be reinserted.</param>
+        /// <param name="cellIndex">The index of the cell.</param>
         private void Reinsert(int partitionIndex, Cell cell, int cellIndex)
         {
             Partition partition = _partitions[partitionIndex];
@@ -181,8 +233,17 @@ namespace HiveBotBattle.Scripts.BSPTree
             }
         }
 
+        /// <summary>
+        /// Increments the count of destroyed cells in the BSP tree.
+        /// </summary>
         public void IncrementDestroyedCells() => CellArray.IncrementDestroyedCells();
 
+
+        /// <summary>
+        /// Collects the leaf partitions of the BSP tree up to a specified maximum tree depth.
+        /// </summary>
+        /// <param name="maxTreeDepth">The maximum depth of the tree to collect leaf partitions from.</param>
+        /// <returns>An array of leaf partitions.</returns>
         private Partition[] CollectLeafPartitions(int maxTreeDepth)
         {
             Partition[] leafPartitionList = new Partition[CalculateLeafPartitionCount(maxTreeDepth)];
@@ -209,6 +270,12 @@ namespace HiveBotBattle.Scripts.BSPTree
             return leafPartitionList;
         }
 
+        /// <summary>
+        /// Finds the positions within shooting range of a given position in the BSP tree.
+        /// </summary>
+        /// <param name="pos">The position to find other positions in shooting range for.</param>
+        /// <param name="partition">The partition to start the search from. If not provided, the root partition is used.</param>
+        /// <returns>A list of positions within shooting range of the given position.</returns>
         public List<Pos> FindPosInShootingRange(Pos pos, Partition partition = null)
         {
             if (CellArray.Count == 0)
@@ -220,7 +287,7 @@ namespace HiveBotBattle.Scripts.BSPTree
             if (partition.IsLeafNode)
             {
                 if (partition.FirstElementIndex == Empty)
-                    return null;
+                    return new List<Pos>();
 
                 ElementIndex currentIndex = ElementIndices[partition.FirstElementIndex];
                 List<Pos> posInShootingRange = new List<Pos>();
@@ -240,7 +307,7 @@ namespace HiveBotBattle.Scripts.BSPTree
                 }
 
                 if (posInShootingRange.Count == 0)
-                    return null;
+                    return new List<Pos>();
 
                 return posInShootingRange;
             }
@@ -263,6 +330,13 @@ namespace HiveBotBattle.Scripts.BSPTree
             return PosInChild1;
         }
 
+
+        /// <summary>
+        /// Finds the nearest position to a given position in the BSP tree.
+        /// </summary>
+        /// <param name="pos">The position to find the nearest position for.</param>
+        /// <param name="partition">The partition to start the search from. If not provided, the root partition is used.</param>
+        /// <returns>The nearest position, or null if no positions are found.</returns>
         public Pos FindNearestPos(Pos pos, Partition partition = null)
         {
             if (CellArray.Count == 0)

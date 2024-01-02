@@ -62,8 +62,8 @@ namespace HiveBotBattle.Scripts
                 return;
             }
 
-            PathFinder.AccessibilityMap MinerAccMap = PathFinder.CalculateAccessibilityMap(map, MotherShip.Pos, BotType.MinerBot);
-            PathFinder.AccessibilityMap FighterAccMap = PathFinder.CalculateAccessibilityMap(map, MotherShip.Pos, BotType.FighterBot);
+            PathFinder.AccessibilityMap MinerAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, BotType.MinerBot);
+            PathFinder.AccessibilityMap FighterAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, BotType.FighterBot);
 
 
             UpdateFighterBots(gameController, map, FighterAccMap);

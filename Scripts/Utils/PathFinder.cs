@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 using HiveBotBattle.Scripts.Utils;
 using HiveBotBattle.Scripts.Utils.Types;
-// using DataStructures.PriorityQueue;
 
 namespace Utils
 {
@@ -11,11 +9,24 @@ namespace Utils
     {
         private const int AStarMultiplier = 2;
 
-        private static int GetID(int x, int y)
-        {
-            return x * 10000 + y;
-        }
+        /// <summary>
+        /// Generates an ID/Hash based on the given x and y coordinates.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <returns>The generated ID.</returns>
+        private static int GenerateID(int x, int y) => x * 10000 + y;
 
+        /// <summary>
+        /// Finds the shortest path from a start position to a target position on a map for a specific bot type.
+        /// </summary>
+        /// <param name="map">The map on which to find the path.</param>
+        /// <param name="startPos">The starting position.</param>
+        /// <param name="targetPos">The target position.</param>
+        /// <param name="botType">The type of bot for which to find the path. Must be either MinerBot or FighterBot.</param>
+        /// <param name="canMine">Optional. If true, the bot can mine through obstacles. Default is false.</param>
+        /// <returns>The next position on the shortest path from the start position to the target position. If no path is found, returns the start position.</returns>
+        /// <exception cref="Exception">Thrown if botType is not MinerBot or FighterBot, or if startPos or targetPos is null, or if the pathfinding takes too long.</exception>
         public static Pos FindPath(Map map, Pos startPos, Pos targetPos, BotType botType, bool canMine = false)
         {
             if (botType is BotType.None or BotType.MotherShip)
@@ -49,9 +60,6 @@ namespace Utils
 
                 currentPathNode = priorityQueue.Dequeue();
                 pathNodesInQueue.Remove(currentPathNode.ID);
-
-                // create test sprite
-                // map.CreateSprite(currentPathNode.GetAsPos(), CellType.Mineral);
 
                 if (targetIsBot && targetPos.IsNextToOrEqual(currentPathNode.X,currentPathNode.Y) || targetPos.Equals(currentPathNode.X,currentPathNode.Y))
                 {
@@ -91,7 +99,7 @@ namespace Utils
                         }
 
                         bool valueFound =
-                        pathNodeDictionary.TryGetValue(GetID(neighborX, neighborY), out PathNode newPathNode);
+                        pathNodeDictionary.TryGetValue(GenerateID(neighborX, neighborY), out PathNode newPathNode);
                         if (!valueFound)
                         {
                             newPathNode = new PathNode(neighborX, neighborY, currentPathNode, newDistance);
@@ -116,14 +124,6 @@ namespace Utils
                     }
             }
 
-            // if (!pathFound) throw new Exception ("NO PATH FOUND!");
-            if (!pathFound)
-            {
-                // GD.Print(startPos + " -> " + targetPos);
-                // Debug.Break();
-            }
-            // if (!pathFound) return startPos;
-
             if (currentPathNode == null) throw new Exception("CurrentVertex == null!");
 
             while (currentPathNode.PreviousNode != null)
@@ -135,12 +135,16 @@ namespace Utils
             return new Pos(currentPathNode.X, currentPathNode.Y);
         }
 
-        public static AccessibilityMap CalculateAccessibilityMap(Map map, Pos startPos, BotType botType)
-        {
-            return new AccessibilityMap(map, startPos, botType);
-        }
+        /// <summary>
+        /// Generates an accessibility map that shows what cells are accessable from the start posisiton.
+        /// </summary>
+        /// <param name="map">The map to generate the accessibility map for.</param>
+        /// <param name="startPos">The starting position for the accessibility map.</param>
+        /// <param name="botType">The type of bot for which the accessibility map is generated.</param>
+        /// <returns>The generated accessibility map.</returns>
+        public static AccessibilityMap GenerateAccessibilityMap(Map map, Pos startPos, BotType botType) => new AccessibilityMap(map, startPos, botType);
 
 
-        
+
     }
 }

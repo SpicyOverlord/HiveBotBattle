@@ -31,7 +31,7 @@ namespace HiveBotBattle.Scripts.BSPTree
         /// <param name="TreeDepth">The depth of the BSP tree.</param>
         public BSPTree(int width, int height, int TreeDepth)
         {
-            
+
             ElementIndices = new List<ElementIndex>();
             CellArray = new ResizingCellArray();
             _partitions = new Partition[CalculatePartitionCount(TreeDepth)];
@@ -161,33 +161,6 @@ namespace HiveBotBattle.Scripts.BSPTree
         }
 
         /// <summary>
-        /// Reinserts all cells into the BSP tree and remove destroyed cells from the cell array if needed.
-        /// </summary>
-        public void ReinsertAllAndCleanIfNeeded()
-        {
-            if (CellArray.Count == 0)
-                return;
-
-            foreach (Partition partition in _leafPartitions)
-                partition.FirstElementIndex = Empty;
-
-
-            ElementIndices.Clear();
-            CellArray.CleanIfNeeded();
-
-            int offset = 0;
-            for (int i = 0; i < CellArray.Count; i++)
-            {
-                Cell cell = CellArray.Get(i);
-                if (cell.IsDestroyed)
-                    offset++;
-                else
-                    Reinsert(0, cell, i - offset);
-
-            }
-        }
-
-        /// <summary>
         /// Reinserts a cell into a specific partition in the BSPTree.
         /// If the partition is not a leaf partition, the cell is inserted into the correct child partition based on its position.
         /// If the partition is a leaf partition, the cell is added to the partition.
@@ -199,7 +172,7 @@ namespace HiveBotBattle.Scripts.BSPTree
         {
             Partition partition = _partitions[partitionIndex];
 
-            // if this Partition is not a leaf Partition, insert this enemy into the correct child Partition
+            // if this Partition is not a leaf Partition, insert this cell into the correct child Partition
             if (partition.FirstElementIndex == Null)
             {
                 if (partition.SplitAlongXAxis)
@@ -233,11 +206,42 @@ namespace HiveBotBattle.Scripts.BSPTree
             }
         }
 
+
+        /// <summary>
+        /// Reinserts all cells into the BSPTree and performs cleaning if needed.
+        /// </summary>
+        public void ReinsertAllAndCleanIfNeeded()
+        {
+            if (CellArray.ShouldBeCleaned())
+                ReinsertAllAndClean();
+        }
+
+        /// <summary>
+        /// Reinserts all cells into the BSP tree and remove destroyed cells from the cell array if needed.
+        /// </summary>
+        public void ReinsertAllAndClean()
+        {
+            foreach (Partition partition in _leafPartitions)
+                partition.FirstElementIndex = Empty;
+
+            ElementIndices.Clear();
+            CellArray.Clean();
+
+            int offset = 0;
+            for (int i = 0; i < CellArray.Count; i++)
+            {
+                Cell cell = CellArray.Get(i);
+                if (cell.IsDestroyed)
+                    offset++;
+                else
+                    Reinsert(0, cell, i - offset);
+            }
+        }
+
         /// <summary>
         /// Increments the count of destroyed cells in the BSP tree.
         /// </summary>
         public void IncrementDestroyedCells() => CellArray.IncrementDestroyedCells();
-
 
         /// <summary>
         /// Collects the leaf partitions of the BSP tree up to a specified maximum tree depth.
@@ -383,7 +387,7 @@ namespace HiveBotBattle.Scripts.BSPTree
             Pos nearestPosInChild1 = FindNearestPos(pos, Child1Partition);
 
             float nearestPosInChild1Distance = nearestPosInChild1 is not null ?
-                                                    pos.DistanceToSquared((Pos)nearestPosInChild1) :
+                                                    pos.DistanceToSquared(nearestPosInChild1) :
                                                     float.MaxValue;
 
             if (splitAxisDistance < nearestPosInChild1Distance)

@@ -266,8 +266,22 @@ public partial class Map : Node2D
         if (_map[pos.X, pos.Y] != null)
         {
             Cell cellToBeDestroyed = _map[pos.X, pos.Y];
-            cellToBeDestroyed.DestroyNode();
+            cellToBeDestroyed.Destroy();
+
+            // tell BSPTree that a cell has been destroyed
+            if (cellToBeDestroyed.CellType is CellType.Deposit)
+            {
+                depositBSPTree.IncrementDestroyedCells();
+                depositBSPTree.ReinsertAllAndCleanIfNeeded();
+            }
+            else if (cellToBeDestroyed.CellType is CellType.Mineral)
+            {
+                mineralBSPTree.IncrementDestroyedCells();
+                mineralBSPTree.ReinsertAllAndCleanIfNeeded();
+            }
+
             _map[pos.X, pos.Y] = null;
+
             return;
         }
         bool isFighterBot = _fighterBotMap[pos.X, pos.Y] is not null;
@@ -283,12 +297,12 @@ public partial class Map : Node2D
             // it should only remove the one that is actually being destroyed, not both
             if (isMinerBot)
             {
-                _minerBotMap[pos.X, pos.Y].DestroyNode();
+                _minerBotMap[pos.X, pos.Y].Destroy();
                 _minerBotMap[pos.X, pos.Y] = null;
             }
             else if (isFighterBot)
             {
-                _fighterBotMap[pos.X, pos.Y].DestroyNode();
+                _fighterBotMap[pos.X, pos.Y].Destroy();
                 _fighterBotMap[pos.X, pos.Y] = null;
             }
             return;

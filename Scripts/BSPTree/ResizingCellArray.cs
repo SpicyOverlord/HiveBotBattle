@@ -1,4 +1,5 @@
 using System.Linq;
+using Godot;
 
 namespace HiveBotBattle.Scripts.BSPTree
 {
@@ -14,8 +15,8 @@ namespace HiveBotBattle.Scripts.BSPTree
 
         private int _lastIndex;
         private Map.Cell[] _cellArray;
-        private int _destroyedCellCount;
 
+        public int DestroyedCellCount { get; private set; }
         /// <summary>
         /// Gets the number of cells in the array.
         /// </summary>
@@ -33,7 +34,7 @@ namespace HiveBotBattle.Scripts.BSPTree
         /// <param name="startSize">The initial size of the array. Default is 16.</param>
         public ResizingCellArray(int startSize = 16)
         {
-            _destroyedCellCount = 0;
+            DestroyedCellCount = 0;
             _lastIndex = 0;
             _cellArray = new Map.Cell[startSize];
         }
@@ -64,36 +65,27 @@ namespace HiveBotBattle.Scripts.BSPTree
             Map.Cell[] newArray = new Map.Cell[_cellArray.Length * 2];
             for (int i = 0; i < _cellArray.Length; i++)
                 newArray[i] = _cellArray[i];
-            
+
             _cellArray = newArray;
         }
 
         /// <summary>
         /// Increments the count of destroyed cells.
         /// </summary>
-        public void IncrementDestroyedCells()
-        {
-            _destroyedCellCount++;
-        }
+        public void IncrementDestroyedCells() => DestroyedCellCount++;
 
         /// <summary>
-        /// Gets the count of destroyed cells.
+        /// Determines whether the cell array should be cleaned based on the percentage of destroyed cells.
         /// </summary>
-        /// <returns>The count of destroyed cells.</returns>
-        public int GetDestroyedCellCount()
-        {
-            return _destroyedCellCount;
-        }
+        /// <returns>True if the cell array should be cleaned, otherwise False.</returns>
+        public bool ShouldBeCleaned() => DestroyedCellCount > 512 && DestroyedCellCount > _cellArray.Length * DestroyedCleanPercentage;
+
 
         /// <summary>
-        /// Cleans the array if the percentage of destroyed cells exceeds the threshold.
+        /// Cleans the cell array by removing destroyed cells and updating the array accordingly.
         /// </summary>
-        public void CleanIfNeeded()
+        public void Clean()
         {
-            // do nothing if the destroyed cell count is less than the threshold
-            if (GetDestroyedCellCount() < _cellArray.Length * DestroyedCleanPercentage)
-                return;
-
             Map.Cell[] newArray = new Map.Cell[_cellArray.Length];
 
             int deletedCells = 0;
@@ -109,7 +101,7 @@ namespace HiveBotBattle.Scripts.BSPTree
             _lastIndex -= deletedCells;
 
             _cellArray = newArray;
-            _destroyedCellCount = 0;
+            DestroyedCellCount = 0;
         }
 
         /// <summary>

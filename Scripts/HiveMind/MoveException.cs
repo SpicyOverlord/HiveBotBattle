@@ -1,6 +1,6 @@
 using System;
 
-namespace AI
+namespace HiveMind
 {
     public class MoveException : Exception { }
 }

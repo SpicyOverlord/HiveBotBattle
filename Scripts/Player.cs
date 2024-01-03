@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using AI;
+using HiveMind;
 using Godot;
 using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
@@ -15,7 +15,7 @@ namespace HiveBotBattle.Scripts
 
         public readonly int PlayerID;
 
-        public readonly IHiveAI HiveAI;
+        public readonly IHiveMind HiveMind;
 
         public readonly MotherShip MotherShip;
         private readonly List<Bot> _fighterBots;
@@ -26,10 +26,10 @@ namespace HiveBotBattle.Scripts
 
         public bool HasLost;
 
-        public Player(int playerID, IHiveAI hiveAI, Pos startPosition, int startMinerals)
+        public Player(int playerID, IHiveMind hiveMind, Pos startPosition, int startMinerals)
         {
             PlayerID = playerID;
-            HiveAI = hiveAI;
+            HiveMind = hiveMind;
             MotherShip = new MotherShip(PlayerID, startPosition);
 
             StoredMinerals = startMinerals;
@@ -91,7 +91,7 @@ namespace HiveBotBattle.Scripts
                 try
                 {
                     FighterBotMove fighterMove =
-                        HiveAI.FighterAI(new BotObservation(gameController, fighterAccMap, this, fighterBot));
+                        HiveMind.FighterAI(new BotObservation(gameController, fighterAccMap, this, fighterBot));
 
                     if (fighterMove.Type is not (FighterMoveType.DoNothing or FighterMoveType.Heal) &&
                         fighterMove.TargetPos == null)
@@ -129,8 +129,8 @@ namespace HiveBotBattle.Scripts
                             if (map.IsShootable(fighterMove.TargetPos) &&
                                 fighterBot.Pos.InShootingRangeOf(fighterMove.TargetPos))
                             {
-                                GameAgent gameAgent = gameController.GetGameAgentAt(fighterMove.TargetPos);
-                                gameAgent.Damage(Bot.DamageAmount);
+                                GameAgent gameAgentToDamage = gameController.GetGameAgentAt(fighterMove.TargetPos);
+                                gameAgentToDamage.Damage(Bot.DamageAmount);
                             }
                             else
                             {
@@ -176,7 +176,7 @@ namespace HiveBotBattle.Scripts
 
                 try
                 {
-                    MinerBotMove minerMove = HiveAI.MinerAI(new BotObservation(gameController, minerAccMap, this, minerBot));
+                    MinerBotMove minerMove = HiveMind.MinerAI(new BotObservation(gameController, minerAccMap, this, minerBot));
 
                     if (minerMove.Type is not (MinerMoveType.DoNothing or MinerMoveType.Heal) &&
                         minerMove.TargetPos == null)
@@ -272,7 +272,7 @@ namespace HiveBotBattle.Scripts
             try
             {
                 MotherShipMoveType motherShipMove =
-                    HiveAI.MotherShipAI(new MotherShipObservation(gameController, fighterAccMap, this, MotherShip));
+                    HiveMind.MotherShipAI(new MotherShipObservation(gameController, fighterAccMap, this, MotherShip));
 
                 switch (motherShipMove)
                 {

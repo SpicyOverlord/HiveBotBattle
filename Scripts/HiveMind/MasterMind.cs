@@ -4,9 +4,9 @@ using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using Utils.Observations;
 
-namespace AI
+namespace HiveMind
 {
-    public class MasterMind : IHiveAI
+    public class MasterMind : IHiveMind
     {
         private bool _isOpenFight;
         private List<Pos> _knownFightTargets;

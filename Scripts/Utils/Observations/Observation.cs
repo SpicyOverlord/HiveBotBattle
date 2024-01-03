@@ -26,7 +26,7 @@ namespace Utils.Observations
         /// <param name="gameController">The game controller.</param>
         /// <param name="accMap">The accessibility map.</param>
         /// <param name="player">The player.</param>
-        /// <param name="gameAgent">The game agent.</param>
+        /// <param name="gameAgent">The gameAgent that is associated with this observation.</param>
         public Observation(GameController gameController, PathFinder.AccessibilityMap accMap, Player player, GameAgent gameAgent)
         {
             _gameController = gameController;

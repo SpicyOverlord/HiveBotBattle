@@ -1,17 +1,17 @@
+using Godot;
 using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using Utils.Observations;
 
-namespace AI
+namespace HiveMind
 {
-    public class MinerBot : IHiveAI
+    public class MinersOnly : IHiveMind
     {
         public MotherShipMoveType MotherShipAI(MotherShipObservation obs)
         {
-            if (obs.GetFriendlyMinerBotCount() < 2)
+            if (obs.GetFriendlyMinerBotCount() <= 100 && obs.GetMinerBuildCost() <= obs.GetStoredMinerals()){
                 return MotherShipMoveType.BuildMiner;
-            // if (obs.GetFriendlyFighterBotCount() < 1)
-            //     return MotherShipMoveType.BuildFighter;
+            }
             return MotherShipMoveType.DoNothing;
         }
 
@@ -38,9 +38,6 @@ namespace AI
 
         public MinerBotMove MinerAI(BotObservation obs)
         {
-            if (obs.GetBotBuildNumber() == 1)
-                return new MinerBotMove(MinerMoveType.MineTowards, obs.GetNearestEnemyMotherShipPosition());
-
             Pos motherShipPos = obs.GetFriendlyMotherShipPosition();
             // unload minerals to mothership if minder bot is full
             if (!obs.CanPickUpMinerals())
@@ -53,6 +50,8 @@ namespace AI
 
             Pos nearestMineral = obs.GetNearestMineralPosition();
             Pos nearestDeposit = obs.GetNearestDepositPosition();
+
+            // GD.Print("nearestMineral: " + nearestMineral + " - nearestDeposit: " + nearestDeposit);
 
             // if there is nothing to mine, do nothing
             if (nearestMineral == null && nearestDeposit == null)

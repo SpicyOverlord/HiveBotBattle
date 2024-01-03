@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AI;
+using HiveMind;
 using Godot;
 using HiveBotBattle.Scripts;
 using Utils;
@@ -28,7 +28,7 @@ public partial class GameController : Node
     [Export]
     public Godot.Collections.Array<Vector2> playerStartPositions;
     [Export]
-    public Godot.Collections.Array<AIAgentType> playerAgents;
+    public Godot.Collections.Array<HiveMindType> playerHiveMinds;
 
     private int _currentPlayerIndex;
     private float _nextUpdateTime = -1;
@@ -59,7 +59,7 @@ public partial class GameController : Node
         Players = new List<Player>();
         for (int i = 0; i < playerStartPositions.Count; i++)
         {
-            IHiveAI playerAgent = AIAgentTypeToHiveAI(playerAgents[i]);
+            IHiveMind playerHiveMind = HiveMindTypeToHiveMind(playerHiveMinds[i]);
 
             Vector2 startPos = playerStartPositions[i];
 
@@ -68,7 +68,7 @@ public partial class GameController : Node
             if (startPos.Y < 0)
                 startPos.Y += mapHeight - 1;
 
-            Players.Add(new Player(i, playerAgent, new Pos((int)startPos.X, (int)startPos.Y), startMineralAmount));
+            Players.Add(new Player(i, playerHiveMind, new Pos((int)startPos.X, (int)startPos.Y), startMineralAmount));
         }
     }
 
@@ -125,15 +125,15 @@ public partial class GameController : Node
         }
     }
 
-    public IHiveAI AIAgentTypeToHiveAI(AIAgentType aiAgentType)
+    public static IHiveMind HiveMindTypeToHiveMind(HiveMindType HiveMindType)
     {
-        return aiAgentType switch
+        return HiveMindType switch
         {
-            AIAgentType.Demo => new DemoAgent(),
-            AIAgentType.MasterMind => new MasterMind(),
-            AIAgentType.TestBot => new MinerBot(),
-            AIAgentType.MinersOnly => new MinersOnly(),
-            AIAgentType.EmptyBot => new EmptyBot(),
+            HiveMindType.Demo => new DemoHiveMind(),
+            HiveMindType.MasterMind => new MasterMind(),
+            HiveMindType.TestBot => new MinerBot(),
+            HiveMindType.MinersOnly => new MinersOnly(),
+            HiveMindType.EmptyBot => new EmptyBot(),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

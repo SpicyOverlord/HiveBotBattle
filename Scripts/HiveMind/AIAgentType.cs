@@ -1,6 +1,6 @@
-namespace AI
+namespace HiveMind
 {
-    public enum AIAgentType
+    public enum HiveMindType
     {
         Demo,
         MasterMind,

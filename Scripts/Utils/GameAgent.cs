@@ -3,42 +3,42 @@ using HiveBotBattle.Scripts.Utils.Types;
 namespace Utils
 {
     /// <summary>
-    /// Represents a game agent in the HiveBotBattle game.
+    /// Represents a GameAgent in the HiveBotBattle game.
     /// </summary>
     public abstract class GameAgent
     {
         /// <summary>
-        /// The ID of the player that owns the game agent.
+        /// The ID of the player that owns the GameAgent.
         /// </summary>
         public readonly int PlayerID;
 
         /// <summary>
-        /// The position of the game agent.
+        /// The position of the GameAgent.
         /// </summary>
         public Pos Pos { get; protected set; }
 
         /// <summary>
-        /// The type of the game agent.
+        /// The type of the GameAgent.
         /// </summary>
         public readonly BotType Type;
 
         /// <summary>
-        /// Indicates whether the game agent is destroyed.
+        /// Indicates whether the GameAgent is destroyed.
         /// </summary>
         public bool IsDestroyed { get; protected set; }
 
         /// <summary>
-        /// The health of the game agent.
+        /// The health of the GameAgent.
         /// </summary>
         public int Health { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GameAgent"/> class.
         /// </summary>
-        /// <param name="playerID">The ID of the player that owns the game agent.</param>
-        /// <param name="botType">The type of the game agent.</param>
-        /// <param name="startPos">The starting position of the game agent.</param>
-        /// <param name="startHealth">The starting health of the game agent.</param>
+        /// <param name="playerID">The ID of the player that owns the GameAgent.</param>
+        /// <param name="botType">The type of the GameAgent.</param>
+        /// <param name="startPos">The starting position of the GameAgent.</param>
+        /// <param name="startHealth">The starting health of the GameAgent.</param>
         protected GameAgent(int playerID, BotType botType, Pos startPos, int startHealth)
         {
             PlayerID = playerID;
@@ -49,13 +49,13 @@ namespace Utils
         }
 
         /// <summary>
-        /// Moves the game agent to the specified position.
+        /// Moves the GameAgent to the specified position.
         /// </summary>
         /// <param name="pos">The position to move to.</param>
         public void MoveTo(Pos pos) => Pos = pos.Clone();
 
         /// <summary>
-        /// Damages the game agent by the specified amount.
+        /// Damages the GameAgent by the specified amount.
         /// </summary>
         /// <param name="damage">The amount of damage to inflict.</param>
         public void Damage(int damage)

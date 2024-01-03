@@ -2,9 +2,9 @@ using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using Utils.Observations;
 
-namespace AI
+namespace HiveMind
 {
-    public interface IHiveAI
+    public interface IHiveMind
     {
         public MotherShipMoveType MotherShipAI(MotherShipObservation obs);
         public FighterBotMove FighterAI(BotObservation obs);

@@ -18,4 +18,4 @@ frameRate = 120
 mapWidth = 150
 mapHeight = 150
 playerStartPositions = Array[Vector2]([Vector2(5, 5), Vector2(-5, -5), Vector2(5, -5), Vector2(-5, 5)])
-playerAgents = Array[int]([3, 3, 3, 3])
+playerHiveMinds = Array[int]([3, 3, 3, 3])

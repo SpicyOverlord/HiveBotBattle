@@ -35,8 +35,6 @@ namespace Utils
             bool isMinerBot = botType == BotType.MinerBot;
             bool isFighterBot = botType == BotType.MinerBot;
 
-            bool pathFound = false;
-
             if (startPos == null)
                 throw new Exception("Start pos is null!");
             if (targetPos == null)
@@ -63,7 +61,7 @@ namespace Utils
 
                 if (targetIsBot && targetPos.IsNextToOrEqual(currentPathNode.X,currentPathNode.Y) || targetPos.Equals(currentPathNode.X,currentPathNode.Y))
                 {
-                    pathFound = true;
+                    // path found!
                     break;
                 }
 

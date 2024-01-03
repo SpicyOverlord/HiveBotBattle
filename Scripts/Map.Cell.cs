@@ -32,7 +32,7 @@ public partial class Map
             _pos = pos.Clone();
         }
 
-        public void DestroyNode()
+        public void Destroy()
         {
             CellNode.QueueFree();            
             _isDestroyed = true;

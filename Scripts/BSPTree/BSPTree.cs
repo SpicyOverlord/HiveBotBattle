@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using static Map;
 
@@ -341,8 +343,10 @@ namespace HiveBotBattle.Scripts.BSPTree
         /// <param name="pos">The position to find the nearest position for.</param>
         /// <param name="partition">The partition to start the search from. If not provided, the root partition is used.</param>
         /// <returns>The nearest position, or null if no positions are found.</returns>
-        public Pos FindNearestPos(Pos pos, Partition partition = null)
+        public Pos FindNearestPos(Pos pos, Partition partition = null, Func<Cell, bool> CellSelectorFunction = null)
         {
+            CellSelectorFunction ??= x => true;
+
             if (CellArray.Count == 0)
                 return null;
 
@@ -366,6 +370,9 @@ namespace HiveBotBattle.Scripts.BSPTree
 
                     // skip if cell content no longer exists
                     if (currentCell.IsDestroyed)
+                        continue;
+                    // skip if cell is not wanted
+                    if (!CellSelectorFunction(currentCell))
                         continue;
 
                     int currentDistance = pos.DistanceToSquared(currentCell.GetPosition());

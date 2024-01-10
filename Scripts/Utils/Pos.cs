@@ -73,6 +73,18 @@ namespace Utils
         /// <returns><c>true</c> if this position is equal to the specified coordinates; otherwise, <c>false</c>.</returns>
         public bool Equals(int x, int y) => X == x && Y == y;
 
+        public static bool operator ==(Pos left, Pos right)
+        {
+            if (left is null || right is null)
+                return false;
+
+            return left.X == right.X && left.Y == right.Y;
+        }
+        public static bool operator !=(Pos left, Pos right)
+        {
+            return !(left == right);
+        }
+
         /// <summary>
         /// Creates a new position that is a copy of this position.
         /// </summary>

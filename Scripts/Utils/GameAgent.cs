@@ -1,3 +1,4 @@
+using HiveBotBattle.Scripts;
 using HiveBotBattle.Scripts.Utils.Types;
 
 namespace Utils
@@ -58,7 +59,7 @@ namespace Utils
         /// Damages the GameAgent by the specified amount.
         /// </summary>
         /// <param name="damage">The amount of damage to inflict.</param>
-        public void Damage(int damage)
+        public void Damage(int damage = Bot.DamageAmount)
         {
             if (IsDestroyed) return;
 

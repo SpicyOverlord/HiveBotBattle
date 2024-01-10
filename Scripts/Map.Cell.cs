@@ -19,6 +19,8 @@ public partial class Map
             CellNode.Position = pos.GetAsVector2();
             _pos = pos.Clone();
 
+            gameAgent?.MoveTo(pos);
+
             this.gameAgent = gameAgent;
             CellType = cellType;
 
@@ -32,6 +34,8 @@ public partial class Map
         {
             CellNode.Position = pos.GetAsVector2();
             _pos = pos.Clone();
+
+            gameAgent?.MoveTo(pos);
         }
 
         public void Destroy()

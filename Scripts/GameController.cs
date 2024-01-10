@@ -32,7 +32,7 @@ public partial class GameController : Node
 
     private int _currentPlayerIndex;
     private float _nextUpdateTime = -1;
-    public bool GameOver;
+    public bool GameOver => Players.Count(p => !p.HasLost) == 1;
 
     public Map Map;
 
@@ -110,18 +110,16 @@ public partial class GameController : Node
                 return;
         }
 
-        // check if the game is over only one player is left
-        int playersRemaining = Players.Count(p => !p.HasLost);
-        if (playersRemaining == 1)
-        {
-            GameOver = true;
-            GD.Print($"Player {Players.First().PlayerID} has Won the game!!!");
-            return;
-        }
-
         foreach (Player player in Players)
         {
             player.TakeTurn(this);
+        }
+
+        // check if the game is over only one player is left
+        if (GameOver)
+        {
+            GD.Print($"Player {Players.First().PlayerID} has Won the game!!!");
+            return;
         }
     }
 
@@ -141,28 +139,17 @@ public partial class GameController : Node
     public GameAgent GetGameAgentAt(Pos pos)
     {
         Map.Cell fighterBot = Map.GetFighterBotCell(pos);
-        if (fighterBot != null)
+        if (fighterBot is not null)
             return fighterBot.gameAgent;
-        
+
         Map.Cell minerBot = Map.GetMinerBotCell(pos);
-        if (minerBot != null)
+        if (minerBot is not null)
             return minerBot.gameAgent;
-        
+
         foreach (Player player in Players)
         {
-            if (player.HasLost)
-                continue;
-
-            if (player.MotherShip.Pos.Equals(pos))
+            if (player.MotherShip.Pos == pos)
                 return player.MotherShip;
-
-            // foreach (Bot fighterBot in player.GetFighterBots())
-            //     if (fighterBot.Pos.Equals(pos))
-            //         return fighterBot;
-
-            // foreach (Bot minerBot in player.GetMinerBots())
-            //     if (minerBot.Pos.Equals(pos))
-            //         return minerBot;
         }
 
         return null;

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using HiveMind;
 using Godot;
 using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using Utils.Observations;
+using System.Linq;
 
 namespace HiveBotBattle.Scripts
 {
@@ -24,7 +24,7 @@ namespace HiveBotBattle.Scripts
         private int _totalBuildFighterBots;
         private int _totalBuildMinerBots;
 
-        public bool HasLost;
+        public bool HasLost { get; private set; }
 
         public Player(int playerID, IHiveMind hiveMind, Pos startPosition, int startMinerals)
         {
@@ -54,13 +54,8 @@ namespace HiveBotBattle.Scripts
         {
             Map map = gameController.Map;
 
+            DestroyEverythingIfLost(map);
             if (HasLost) return;
-            if (MotherShip.IsDestroyed)
-            {
-                HasLost = true;
-                DeleteEverything(map);
-                return;
-            }
 
             PathFinder.AccessibilityMap MinerAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, BotType.MinerBot);
             PathFinder.AccessibilityMap FighterAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, BotType.FighterBot);
@@ -77,11 +72,14 @@ namespace HiveBotBattle.Scripts
         {
             for (int i = 0; i < _fighterBots.Count; i++)
             {
+                DestroyEverythingIfLost(map);
+                if (HasLost || gameController.GameOver) return;
+
                 Bot fighterBot = _fighterBots[i];
                 // delete bot if it is destroyed
-                if (fighterBot == null || fighterBot.IsDestroyed)
+                if (fighterBot is null || fighterBot.ShouldBeDestroyed)
                 {
-                    if (fighterBot != null)
+                    if (fighterBot is not null)
                         map.DestroyVisual(fighterBot.Pos);
 
                     _fighterBots.RemoveAt(i--);
@@ -94,19 +92,18 @@ namespace HiveBotBattle.Scripts
                         HiveMind.FighterAI(new BotObservation(gameController, fighterAccMap, this, fighterBot));
 
                     if (fighterMove.Type is not (FighterMoveType.DoNothing or FighterMoveType.Heal) &&
-                        fighterMove.TargetPos == null)
-                        throw new Exception(fighterMove.Type + ": MoveTarget is null!");
+                        fighterMove.TargetPos is null)
+                        throw new Exception(fighterMove.Type + ": TargetPos is null!");
 
                     switch (fighterMove.Type)
                     {
                         case FighterMoveType.DoNothing:
                             continue;
                         case FighterMoveType.Move:
-                            if (!map.IsWalkable(fighterMove.TargetPos) || map.GetFighterBotCell(fighterMove.TargetPos) != null)
+                            if (!map.IsWalkable(fighterMove.TargetPos) || map.GetFighterBotCell(fighterMove.TargetPos) is not null)
                                 break;
 
                             map.MoveBotTo(fighterBot, fighterMove.TargetPos);
-                            fighterBot.MoveTo(fighterMove.TargetPos);
                             break;
                         case FighterMoveType.MoveTowards:
                             // if the target position is not accessible, find path to closest pos
@@ -119,24 +116,35 @@ namespace HiveBotBattle.Scripts
                             if (fighterBot.Pos.Equals(nextPos))
                                 break;
 
-                            if (!map.IsWalkable(nextPos) || map.GetFighterBotCell(nextPos) != null)
+                            if (!map.IsWalkable(nextPos) || map.GetFighterBotCell(nextPos) is not null)
                                 break;
 
                             map.MoveBotTo(fighterBot, nextPos);
-                            fighterBot.MoveTo(nextPos);
                             break;
                         case FighterMoveType.Shoot:
                             if (map.IsShootable(fighterMove.TargetPos) &&
                                 fighterBot.Pos.InShootingRangeOf(fighterMove.TargetPos))
                             {
                                 GameAgent gameAgentToDamage = gameController.GetGameAgentAt(fighterMove.TargetPos);
-                                gameAgentToDamage.Damage(Bot.DamageAmount);
+
+                                // TODO remove this
+                                // var cell = map.GetCell(fighterMove.TargetPos);
+                                // var test3 = map.GetCell(fighterMove.TargetPos)?.CellType is CellType.MotherShip;
+
+
+                                // if (gameController.Players[gameAgentToDamage.PlayerID].HasLost)
+                                // {
+                                //     GD.Print("Player " + gameAgentToDamage.PlayerID + " has lost!");
+                                //     break;
+                                // }
+
+                                gameAgentToDamage.Damage();
                             }
                             else
                             {
-                                if (fighterMove.TargetPos == null)
+                                if (fighterMove.TargetPos is null)
                                     throw new Exception("Shoot failed: Target is null!");
-                                if (map.GetFighterBotCell(fighterMove.TargetPos) == null)
+                                if (map.GetFighterBotCell(fighterMove.TargetPos) is null)
                                     throw new Exception("Shoot failed: Cell is null! " + fighterMove.TargetPos);
 
                                 throw new Exception("Shoot failed: Bot" + fighterBot.Pos + "  Target" +
@@ -165,9 +173,12 @@ namespace HiveBotBattle.Scripts
         {
             for (int i = 0; i < _minerBots.Count; i++)
             {
+                DestroyEverythingIfLost(map);
+                if (HasLost || gameController.GameOver) return;
+
                 Bot minerBot = _minerBots[i];
                 // delete bot if it is destroyed
-                if (minerBot.IsDestroyed)
+                if (minerBot.ShouldBeDestroyed)
                 {
                     _minerBots.RemoveAt(i--);
                     map.DestroyVisual(minerBot.Pos);
@@ -179,7 +190,7 @@ namespace HiveBotBattle.Scripts
                     MinerBotMove minerMove = HiveMind.MinerAI(new BotObservation(gameController, minerAccMap, this, minerBot));
 
                     if (minerMove.Type is not (MinerMoveType.DoNothing or MinerMoveType.Heal) &&
-                        minerMove.TargetPos == null)
+                        minerMove.TargetPos is null)
                         throw new Exception(minerMove.Type + ": MoveTarget is null!");
 
                     switch (minerMove.Type)
@@ -187,11 +198,10 @@ namespace HiveBotBattle.Scripts
                         case MinerMoveType.DoNothing:
                             continue;
                         case MinerMoveType.Move:
-                            if (!map.IsWalkable(minerMove.TargetPos) || map.GetMinerBotCell(minerMove.TargetPos) != null)
+                            if (!map.IsWalkable(minerMove.TargetPos) || map.IsMinerBot(minerMove.TargetPos))
                                 break;
 
                             map.MoveBotTo(minerBot, minerMove.TargetPos);
-                            minerBot.MoveTo(minerMove.TargetPos);
                             break;
                         case MinerMoveType.MineTowards:
                         case MinerMoveType.MoveTowards:
@@ -200,7 +210,7 @@ namespace HiveBotBattle.Scripts
                             // if the target position is not accessible, find path to closest pos
                             // (if we can mine, every pos is accessible)
                             Pos targetPos = minerMove.TargetPos;
-                            if (!canMine || map.IsSurrounded(targetPos, canMine))
+                            if (map.IsSurrounded(targetPos, canMine))
                                 targetPos = minerAccMap.FindClosestPos(minerBot.Pos, minerMove.TargetPos);
 
                             //find path
@@ -210,17 +220,21 @@ namespace HiveBotBattle.Scripts
                             if (minerBot.Pos.Equals(nextPos))
                                 break;
 
-                            if (map.IsMineable(nextPos) && canMine)
+                            if (map.IsMineable(nextPos))
                             {
                                 map.Mine(nextPos);
                                 break;
                             }
 
-                            if (!map.IsWalkable(nextPos) || map.GetMinerBotCell(nextPos) != null)
+                            if (!map.IsWalkable(nextPos) || map.IsMinerBot(nextPos))
                                 break;
 
+                            if (minerBot.Pos.Equals(map.GetMinerBotCell(minerBot.Pos)?.GetPosition()))
+                            {
+                                GD.Print("MinerBotPos: " + minerBot.Pos + " CellPos: " + map.GetMinerBotCell(minerBot.Pos).GetPosition());
+                            }
+
                             map.MoveBotTo(minerBot, nextPos);
-                            minerBot.MoveTo(nextPos);
                             break;
                         case MinerMoveType.Mine:
                             if ((map.IsStone(minerMove.TargetPos) || map.IsDeposit(minerMove.TargetPos)) &&
@@ -269,6 +283,9 @@ namespace HiveBotBattle.Scripts
 
         private void UpdateMotherShip(GameController gameController, Map map, PathFinder.AccessibilityMap fighterAccMap)
         {
+            DestroyEverythingIfLost(map);
+            if (HasLost || gameController.GameOver) return;
+
             try
             {
                 MotherShipMoveType motherShipMove =
@@ -298,9 +315,25 @@ namespace HiveBotBattle.Scripts
 
         private void DeleteEverything(Map map)
         {
-            foreach (Bot fighterBot in _fighterBots) map.DestroyVisual(fighterBot.Pos);
+            for (int i = 0; i < _fighterBots.Count; i++)
+            {
+                Bot fighterBot = _fighterBots[i];
+                try { map.DestroyVisual(fighterBot.Pos); }
+                catch (Exception e)
+                {
+                    GD.Print(e);
+                }
+            }
 
-            foreach (Bot minerBot in _minerBots) map.DestroyVisual(minerBot.Pos);
+            for (int i = 0; i < _minerBots.Count; i++)
+            {
+                Bot minerBot = _minerBots[i];
+                try { map.DestroyVisual(minerBot.Pos); }
+                catch (Exception e2)
+                {
+                    GD.Print(e2);
+                }
+            }
 
             map.DestroyVisual(MotherShip.Pos);
         }
@@ -313,7 +346,7 @@ namespace HiveBotBattle.Scripts
 
             Pos emptyNeighbor = map.GetFirstEmptyNeighbor(MotherShip.Pos);
             // if no empty neighbors, do nothing
-            if (emptyNeighbor == null) return;
+            if (emptyNeighbor is null) return;
 
             if (botType == BotType.FighterBot)
             {
@@ -321,7 +354,7 @@ namespace HiveBotBattle.Scripts
                 Bot newFighterBot = new Bot(PlayerID, _totalBuildFighterBots, BotType.FighterBot, emptyNeighbor);
                 _fighterBots.Add(newFighterBot);
                 // create visual
-                map.CreateVisual(emptyNeighbor, CellType.FighterBot, playerID);
+                map.CreateCell(emptyNeighbor, CellType.FighterBot, playerID, newFighterBot);
 
                 PayForFighterBot();
                 _totalBuildFighterBots++;
@@ -332,7 +365,7 @@ namespace HiveBotBattle.Scripts
                 Bot newMinerBot = new Bot(PlayerID, _totalBuildMinerBots, BotType.MinerBot, emptyNeighbor);
                 _minerBots.Add(newMinerBot);
                 // create visual
-                map.CreateVisual(emptyNeighbor, CellType.MinerBot, playerID);
+                map.CreateCell(emptyNeighbor, CellType.MinerBot, playerID, newMinerBot);
 
                 PayForMinerBot();
                 _totalBuildMinerBots++;
@@ -361,6 +394,14 @@ namespace HiveBotBattle.Scripts
             return false;
         }
 
+        public void DestroyEverythingIfLost(Map map)
+        {
+            if (!HasLost && MotherShip.ShouldBeDestroyed)
+            {
+                HasLost = true;
+                DeleteEverything(map);
+            }
+        }
         private static void LogError(Exception e)
         {
             GD.Print("[ERROR] " + e.Message + "\n" + e.StackTrace);

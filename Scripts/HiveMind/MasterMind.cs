@@ -24,7 +24,7 @@ namespace HiveMind
             bool weShouldBuildMiner = obs.GetDepositPositions().Count != 0 && weHaveEnoughMiners;
 
             bool enemyFightersTooClose = false;
-            if (_nearestEnemyFighterToBase != null)
+            if (_nearestEnemyFighterToBase is not null)
             {
                 float nearestEnemyFighterDistance = obs.GetBotPosition().DistanceTo(_nearestEnemyFighterToBase);
                 float maxDistance = obs.GetBotPosition()
@@ -67,22 +67,22 @@ namespace HiveMind
 
             Pos nearestFighterPos = obs.GetNearestEnemyFighterBotPosition();
             // if an enemy Fighter is in range, shoot it
-            if (target == null && nearestFighterPos != null &&
+            if (target is null && nearestFighterPos is not null &&
                 obs.GetBotPosition().InShootingRangeOf(nearestFighterPos))
                 return new FighterBotMove(FighterMoveType.Shoot, nearestFighterPos);
 
             Pos nearestEnemyMotherShip = obs.GetNearestEnemyMotherShipPosition();
             // if an enemy MotherShip is in range, shoot it
-            if (target == null && nearestEnemyMotherShip != null && botPos.InShootingRangeOf(nearestEnemyMotherShip))
+            if (target is null && nearestEnemyMotherShip is not null && botPos.InShootingRangeOf(nearestEnemyMotherShip))
                 target = nearestEnemyMotherShip;
 
             Pos nearestMinerPos = obs.GetNearestEnemyMinerBotPosition();
             // if an enemy Miner is in range, shoot it
-            if (target == null && nearestMinerPos != null && botPos.InShootingRangeOf(nearestMinerPos))
+            if (target is null && nearestMinerPos is not null && botPos.InShootingRangeOf(nearestMinerPos))
                 target = nearestMinerPos;
 
 
-            if (target != null)
+            if (target is not null)
             {
                 if (!target.Equals(nearestEnemyMotherShip))
                     _knownFightTargets.Add(target);
@@ -113,11 +113,11 @@ namespace HiveMind
             //
 
             bool isMinerHunter = obs.GetBotBuildNumber() % 10 == 0;
-            if (isMinerHunter && nearestMinerPos != null)
+            if (isMinerHunter && nearestMinerPos is not null)
                 return new FighterBotMove(FighterMoveType.MoveTowards, nearestMinerPos);
 
 
-            if (nearestFighterPos != null &&
+            if (nearestFighterPos is not null &&
                 obs.CanPathFindTo(nearestFighterPos) &&
                 botPos.DistanceTo(nearestFighterPos) < botPos.DistanceTo(nearestEnemyMotherShip))
                 return new FighterBotMove(FighterMoveType.MoveTowards, nearestFighterPos);
@@ -147,7 +147,7 @@ namespace HiveMind
 
             // pick up mineral if bot is next to it
             Pos nearMin = obs.GetNearestMineralPosition();
-            if (nearMin != null && obs.IsNextTo(nearMin))
+            if (nearMin is not null && obs.IsNextTo(nearMin))
                 return new MinerBotMove(MinerMoveType.PickUpMineral, nearMin);
 
             // if (obs.GetDepositPositions().Count == 0 || obs.GetBotBuildNumber() % 20 == 5)
@@ -158,11 +158,11 @@ namespace HiveMind
             Pos nearestDeposit = GetNearestNotAlreadyTargetedPos(botPos, obs.GetDepositPositions());
 
             // move towards nearest deposit if there is no minerals in the map
-            if (nearestMineral == null)
+            if (nearestMineral is null)
                 return new MinerBotMove(MinerMoveType.MineTowards, nearestDeposit);
 
             // move towards nearest mineral if there is no deposits in the map
-            if (nearestDeposit == null)
+            if (nearestDeposit is null)
                 return new MinerBotMove(MinerMoveType.MineTowards, nearestMineral);
 
 

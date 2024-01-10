@@ -55,7 +55,7 @@ namespace HiveBotBattle.Scripts
             MaxHealth)
         {
             BotID = botID;
-            IsDestroyed = false;
+            ShouldBeDestroyed = false;
         }
 
         /// <summary>

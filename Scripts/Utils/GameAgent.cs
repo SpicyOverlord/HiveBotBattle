@@ -26,7 +26,7 @@ namespace Utils
         /// <summary>
         /// Indicates whether the GameAgent is destroyed.
         /// </summary>
-        public bool IsDestroyed { get; protected set; }
+        public bool ShouldBeDestroyed { get; protected set; }
 
         /// <summary>
         /// The health of the GameAgent.
@@ -46,7 +46,7 @@ namespace Utils
             Type = botType;
             Pos = startPos;
             Health = startHealth;
-            IsDestroyed = false;
+            ShouldBeDestroyed = false;
         }
 
         /// <summary>
@@ -61,10 +61,10 @@ namespace Utils
         /// <param name="damage">The amount of damage to inflict.</param>
         public void Damage(int damage = Bot.DamageAmount)
         {
-            if (IsDestroyed) return;
+            if (ShouldBeDestroyed) return;
 
             Health -= damage;
-            if (Health <= 0) IsDestroyed = true;
+            if (Health <= 0) ShouldBeDestroyed = true;
         }
     }
 }

@@ -140,6 +140,14 @@ public partial class GameController : Node
 
     public GameAgent GetGameAgentAt(Pos pos)
     {
+        Map.Cell fighterBot = Map.GetFighterBotCell(pos);
+        if (fighterBot != null)
+            return fighterBot.gameAgent;
+        
+        Map.Cell minerBot = Map.GetMinerBotCell(pos);
+        if (minerBot != null)
+            return minerBot.gameAgent;
+        
         foreach (Player player in Players)
         {
             if (player.HasLost)
@@ -148,13 +156,13 @@ public partial class GameController : Node
             if (player.MotherShip.Pos.Equals(pos))
                 return player.MotherShip;
 
-            foreach (Bot fighterBot in player.GetFighterBots())
-                if (fighterBot.Pos.Equals(pos))
-                    return fighterBot;
+            // foreach (Bot fighterBot in player.GetFighterBots())
+            //     if (fighterBot.Pos.Equals(pos))
+            //         return fighterBot;
 
-            foreach (Bot minerBot in player.GetMinerBots())
-                if (minerBot.Pos.Equals(pos))
-                    return minerBot;
+            // foreach (Bot minerBot in player.GetMinerBots())
+            //     if (minerBot.Pos.Equals(pos))
+            //         return minerBot;
         }
 
         return null;

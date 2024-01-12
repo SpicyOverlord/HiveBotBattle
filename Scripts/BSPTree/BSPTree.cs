@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Godot;
-using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using static Map;
 
@@ -282,12 +282,11 @@ namespace HiveBotBattle.Scripts.BSPTree
         /// <param name="pos">The position to find other positions in shooting range for.</param>
         /// <param name="partition">The partition to start the search from. If not provided, the root partition is used.</param>
         /// <returns>A list of positions within shooting range of the given position.</returns>
-        public List<Pos> FindPosInShootingRange(Pos pos, Partition partition = null)
+        public List<Pos> FindPosInShootingRange(Pos pos, Func<Cell, bool> CellSelectorFunction = null) => FindPosInShootingRange(pos, _partitions[0], CellSelectorFunction);
+        private List<Pos> FindPosInShootingRange(Pos pos, Partition partition, Func<Cell, bool> CellSelectorFunction = null)
         {
             if (CellArray.Count == 0)
                 return new List<Pos>();
-
-            partition ??= _partitions[0];
 
             // if partition is leaf node, return nearest pos in partition (or null if no cells in partition)
             if (partition.IsLeafNode)
@@ -304,6 +303,9 @@ namespace HiveBotBattle.Scripts.BSPTree
                     currentIndex = ElementIndices[currentIndex.Next];
                     // skip if cell content no longer exists
                     if (currentCell.IsDestroyed)
+                        continue;
+                    // skip if cell is not wanted
+                    if (!CellSelectorFunction(currentCell))
                         continue;
 
                     if (pos.InShootingRangeOf(currentCell.GetPosition()))
@@ -323,12 +325,12 @@ namespace HiveBotBattle.Scripts.BSPTree
             bool posIsInLeftChild = splitAxisPosValue <= partition.SplitValue;
 
             Partition Child1Partition = _partitions[posIsInLeftChild ? partition.LeftChildIndex : partition.RightChildIndex];
-            List<Pos> PosInChild1 = FindPosInShootingRange(pos, Child1Partition);
+            List<Pos> PosInChild1 = FindPosInShootingRange(pos, Child1Partition, CellSelectorFunction);
 
             if (splitAxisDistance < Bot.ShootingRange)
             {
                 Partition Child2Partition = _partitions[posIsInLeftChild ? partition.RightChildIndex : partition.LeftChildIndex];
-                List<Pos> PosInChild2 = FindPosInShootingRange(pos, Child2Partition);
+                List<Pos> PosInChild2 = FindPosInShootingRange(pos, Child2Partition, CellSelectorFunction);
 
                 PosInChild1.AddRange(PosInChild2);
                 return PosInChild1;
@@ -343,14 +345,14 @@ namespace HiveBotBattle.Scripts.BSPTree
         /// <param name="pos">The position to find the nearest position for.</param>
         /// <param name="partition">The partition to start the search from. If not provided, the root partition is used.</param>
         /// <returns>The nearest position, or null if no positions are found.</returns>
-        public Pos FindNearestPos(Pos pos, Partition partition = null, Func<Cell, bool> CellSelectorFunction = null)
-        {
-            CellSelectorFunction ??= x => true;
+        public Pos FindNearestPos(Pos pos, Func<Cell, bool> CellSelectorFunction = null) => FindNearestPos(pos, _partitions[0], CellSelectorFunction);
 
+        private Pos FindNearestPos(Pos pos, Partition partition, Func<Cell, bool> CellSelectorFunction = null)
+        {
             if (CellArray.Count == 0)
                 return null;
 
-            partition ??= _partitions[0];
+            CellSelectorFunction ??= x => true;
 
             // if partition is leaf node, return nearest pos in partition (or null if no cells in partition)
             if (partition.IsLeafNode)
@@ -371,6 +373,8 @@ namespace HiveBotBattle.Scripts.BSPTree
                     // skip if cell content no longer exists
                     if (currentCell.IsDestroyed)
                         continue;
+
+
                     // skip if cell is not wanted
                     if (!CellSelectorFunction(currentCell))
                         continue;
@@ -391,7 +395,7 @@ namespace HiveBotBattle.Scripts.BSPTree
             bool posIsInLeftChild = splitAxisPosValue <= partition.SplitValue;
 
             Partition Child1Partition = _partitions[posIsInLeftChild ? partition.LeftChildIndex : partition.RightChildIndex];
-            Pos nearestPosInChild1 = FindNearestPos(pos, Child1Partition);
+            Pos nearestPosInChild1 = FindNearestPos(pos, Child1Partition, CellSelectorFunction);
 
             float nearestPosInChild1Distance = nearestPosInChild1 is not null ?
                                                     pos.DistanceToSquared(nearestPosInChild1) :
@@ -400,7 +404,7 @@ namespace HiveBotBattle.Scripts.BSPTree
             if (splitAxisDistance < nearestPosInChild1Distance)
             {
                 Partition Child2Partition = _partitions[posIsInLeftChild ? partition.RightChildIndex : partition.LeftChildIndex];
-                Pos nearestPosInChild2 = FindNearestPos(pos, Child2Partition);
+                Pos nearestPosInChild2 = FindNearestPos(pos, Child2Partition, CellSelectorFunction);
 
                 float nearestPosInChild2Distance = nearestPosInChild2 is not null ?
                                                          pos.DistanceToSquared(nearestPosInChild2) :

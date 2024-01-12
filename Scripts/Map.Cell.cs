@@ -11,7 +11,7 @@ public partial class Map
         private readonly Node2D CellNode;
         private Pos _pos;
 
-        private bool _isDestroyed;
+        private bool _shouldBeDestroyed;
 
         public Cell(Pos pos, Node2D node, CellType cellType, GameAgent gameAgent = null)
         {
@@ -24,24 +24,23 @@ public partial class Map
             this.gameAgent = gameAgent;
             CellType = cellType;
 
-            _isDestroyed = false;
+            _shouldBeDestroyed = false;
         }
 
-        public bool IsDestroyed => _isDestroyed;
+        public bool IsDestroyed => _shouldBeDestroyed;
         public Pos GetPosition() => _pos;
 
         public void MoveTo(Pos pos)
         {
             CellNode.Position = pos.GetAsVector2();
             _pos = pos.Clone();
-
             gameAgent?.MoveTo(pos);
         }
 
         public void Destroy()
         {
             CellNode.QueueFree();
-            _isDestroyed = true;
+            _shouldBeDestroyed = true;
         }
     }
 }

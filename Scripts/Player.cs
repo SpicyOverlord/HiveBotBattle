@@ -6,6 +6,7 @@ using HiveBotBattle.Scripts.Utils.Types;
 using Utils;
 using Utils.Observations;
 using System.Linq;
+using static Map;
 
 namespace HiveBotBattle.Scripts
 {
@@ -126,18 +127,6 @@ namespace HiveBotBattle.Scripts
                                 fighterBot.Pos.InShootingRangeOf(fighterMove.TargetPos))
                             {
                                 GameAgent gameAgentToDamage = gameController.GetGameAgentAt(fighterMove.TargetPos);
-
-                                // TODO remove this
-                                // var cell = map.GetCell(fighterMove.TargetPos);
-                                // var test3 = map.GetCell(fighterMove.TargetPos)?.CellType is CellType.MotherShip;
-
-
-                                // if (gameController.Players[gameAgentToDamage.PlayerID].HasLost)
-                                // {
-                                //     GD.Print("Player " + gameAgentToDamage.PlayerID + " has lost!");
-                                //     break;
-                                // }
-
                                 gameAgentToDamage.Damage();
                             }
                             else
@@ -318,21 +307,15 @@ namespace HiveBotBattle.Scripts
             for (int i = 0; i < _fighterBots.Count; i++)
             {
                 Bot fighterBot = _fighterBots[i];
-                try { map.DestroyVisual(fighterBot.Pos); }
-                catch (Exception e)
-                {
-                    GD.Print(e);
-                }
+                fighterBot.Damage(9999999);
+                map.DestroyVisual(fighterBot.Pos);
             }
 
             for (int i = 0; i < _minerBots.Count; i++)
             {
                 Bot minerBot = _minerBots[i];
-                try { map.DestroyVisual(minerBot.Pos); }
-                catch (Exception e2)
-                {
-                    GD.Print(e2);
-                }
+                minerBot.Damage(9999999);
+                map.DestroyVisual(minerBot.Pos);
             }
 
             map.DestroyVisual(MotherShip.Pos);

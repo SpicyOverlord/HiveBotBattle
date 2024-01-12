@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HiveBotBattle.Scripts;
 using HiveBotBattle.Scripts.Utils.Types;
+using static Map;
 
 namespace Utils.Observations
 {
@@ -39,9 +41,9 @@ namespace Utils.Observations
         }
 
         /// <summary>
-        /// Gets the ID of the player associated with this observation.
+        /// Gets the ID of the player associated with this observation and game agent.
         /// </summary>
-        /// <returns>The player ID.</returns>
+        /// <returns>The player's ID.</returns>
         public int GetPlayerID() => _gameAgent.PlayerID;
 
         /// <summary>
@@ -174,6 +176,63 @@ namespace Utils.Observations
         public List<Pos> GetEnemyMinerBotPositions() => _gameController.GetEnemyMinerBots(GetPlayerID())
                 .Select(bot => bot.Pos.Clone()).ToList();
 
+        /// <summary>
+        /// Gets the nearest friendly fighter bot position.
+        /// </summary>
+        /// <returns>The nearest friendly fighter bot position. If there are no friendly fighter bots, returns null.</returns>
+        public Pos GetNearestFriendlyFighterBotPosition() => _map.fighterBSPTree.FindNearestPos(GetBotPosition(), IsFriendly());
+        // public Pos GetNearestFriendlyFighterBotPosition() => GetNearestPosition(GetFriendlyFighterBotPositions());
+
+        /// <summary>
+        /// Gets the nearest friendly miner bot position.
+        /// </summary>
+        /// <returns>The nearest friendly miner bot position. If there are no friendly miner bots, returns null.</returns>
+        public Pos GetNearestFriendlyMinerBotPosition() => _map.minerBSPTree.FindNearestPos(GetBotPosition(), IsFriendly());
+        // public Pos GetNearestFriendlyMinerBotPosition() => GetNearestPosition(GetFriendlyMinerBotPositions());
+
+
+        private Func<Cell, bool> IsFriendly() => c => c.gameAgent.PlayerID == GetPlayerID();
+        private Func<Cell, bool> IsEnemy() => c => c.gameAgent.PlayerID != GetPlayerID();
+
+        /// <summary>
+        /// Gets the nearest enemy fighter bot position.
+        /// </summary>
+        /// <returns>The nearest enemy fighter bot position. If there are no enemy fighter bots, returns null.</returns>
+        public Pos GetNearestEnemyFighterBotPosition() => _map.fighterBSPTree.FindNearestPos(GetBotPosition(), IsEnemy());
+
+        // public Pos GetNearestEnemyFighterBotPosition() => GetNearestPosition(GetEnemyFighterBotPositions());
+
+        /// <summary>
+        /// Gets the nearest enemy miner bot position.
+        /// </summary>
+        /// <returns>The nearest enemy miner bot position. If there are no enemy miner bots, returns null.</returns>
+        public Pos GetNearestEnemyMinerBotPosition() => _map.minerBSPTree.FindNearestPos(GetBotPosition(), IsEnemy());
+        // public Pos GetNearestEnemyMinerBotPosition() => GetNearestPosition(GetEnemyMinerBotPositions());
+
+        // private List<Pos> GetPositionsInShootingRange(List<Pos> botList) => botList.Where(pos => _gameAgent.Pos.InShootingRangeOf(pos))
+        //         .Select(pos => pos.Clone()).ToList();
+
+        public List<Pos> GetEnemyFighterBotsInShootingRange() => _map.fighterBSPTree.FindPosInShootingRange(GetBotPosition(), IsEnemy());
+
+        /// <summary>
+        /// Gets the positions of enemy miner bots in shooting range.
+        /// </summary>
+        /// <returns>A list of positions of enemy miner bots in shooting range.</returns>
+        public List<Pos> GetEnemyMinerBotsInShootingRange() => _map.minerBSPTree.FindPosInShootingRange(GetBotPosition(), IsEnemy());
+
+        /// <summary>
+        /// Gets the positions of enemy fighter bots in shooting range.
+        /// </summary>
+        /// <returns>A list of positions of enemy fighter bots in shooting range.</returns>
+        public Pos GetFriendlyMotherShipPosition() => _gameController.GetFriendlyMotherShip(GetPlayerID()).Pos.Clone();
+
+        /// <summary>
+        /// Gets the positions of enemy motherships.
+        /// </summary>
+        /// <returns>A list of positions of enemy motherships.</returns>
+        public List<Pos> GetEnemyMotherShipPositions() => _gameController.GetEnemyMotherShips(GetPlayerID())
+                .Select(enemyMotherShip => enemyMotherShip.Pos.Clone()).ToList();
+
 
         /// <summary>
         /// Gets the nearest position from a list of positions to the bot.
@@ -196,54 +255,6 @@ namespace Utils.Observations
 
             return nearestPos?.Clone();
         }
-
-        /// <summary>
-        /// Gets the nearest friendly fighter bot position.
-        /// </summary>
-        /// <returns>The nearest friendly fighter bot position. If there are no friendly fighter bots, returns null.</returns>
-        public Pos GetNearestFriendlyFighterBotPosition() => GetNearestPosition(GetFriendlyFighterBotPositions());
-
-        /// <summary>
-        /// Gets the nearest friendly miner bot position.
-        /// </summary>
-        /// <returns>The nearest friendly miner bot position. If there are no friendly miner bots, returns null.</returns>
-        public Pos GetNearestFriendlyMinerBotPosition() => GetNearestPosition(GetFriendlyMinerBotPositions());
-
-        /// <summary>
-        /// Gets the nearest enemy fighter bot position.
-        /// </summary>
-        /// <returns>The nearest enemy fighter bot position. If there are no enemy fighter bots, returns null.</returns>
-        public Pos GetNearestEnemyFighterBotPosition() => GetNearestPosition(GetEnemyFighterBotPositions());
-
-        /// <summary>
-        /// Gets the nearest enemy miner bot position.
-        /// </summary>
-        /// <returns>The nearest enemy miner bot position. If there are no enemy miner bots, returns null.</returns>
-        public Pos GetNearestEnemyMinerBotPosition() => GetNearestPosition(GetEnemyMinerBotPositions());
-
-        private List<Pos> GetPositionsInShootingRange(List<Pos> botList) => botList.Where(pos => _gameAgent.Pos.InShootingRangeOf(pos))
-                .Select(pos => pos.Clone()).ToList();
-
-        public List<Pos> GetEnemyFighterBotsInShootingRange() => GetPositionsInShootingRange(GetEnemyFighterBotPositions());
-
-       /// <summary>
-        /// Gets the positions of enemy miner bots in shooting range.
-        /// </summary>
-        /// <returns>A list of positions of enemy miner bots in shooting range.</returns>
-        public List<Pos> GetEnemyMinerBotsInShootingRange() => GetPositionsInShootingRange(GetEnemyMinerBotPositions());
-
-        /// <summary>
-        /// Gets the positions of enemy fighter bots in shooting range.
-        /// </summary>
-        /// <returns>A list of positions of enemy fighter bots in shooting range.</returns>
-        public Pos GetFriendlyMotherShipPosition() => _gameController.GetFriendlyMotherShip(GetPlayerID()).Pos.Clone();
-
-        /// <summary>
-        /// Gets the positions of enemy motherships.
-        /// </summary>
-        /// <returns>A list of positions of enemy motherships.</returns>
-        public List<Pos> GetEnemyMotherShipPositions() => _gameController.GetEnemyMotherShips(GetPlayerID())
-                .Select(enemyMotherShip => enemyMotherShip.Pos.Clone()).ToList();
 
         /// <summary>
         /// Gets the nearest position of an enemy mothership.

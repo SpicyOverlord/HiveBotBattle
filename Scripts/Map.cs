@@ -66,6 +66,8 @@ public partial class Map : Node2D
 
     public BSPTree mineralBSPTree;
     public BSPTree depositBSPTree;
+    public BSPTree fighterBSPTree;
+    public BSPTree minerBSPTree;
 
     public int Height;
     public int Width;
@@ -94,6 +96,8 @@ public partial class Map : Node2D
 
         mineralBSPTree = new BSPTree(width, height, BSPTreeDepth);
         depositBSPTree = new BSPTree(width, height, BSPTreeDepth);
+        minerBSPTree = new BSPTree(width, height, BSPTreeDepth);
+        fighterBSPTree = new BSPTree(width, height, BSPTreeDepth);
     }
 
     private void InitializeCellArrays(int width, int height)
@@ -106,7 +110,7 @@ public partial class Map : Node2D
     private void AddMotherShipVisuals(List<Player> players)
     {
         foreach (Player player in players)
-            CreateVisual(player.MotherShip.Pos, CellType.MotherShip, player.PlayerID);
+            CreateCell(player.MotherShip.Pos, CellType.MotherShip, player.PlayerID, player.MotherShip);
     }
 
     private void CreateLevelLayout(int width, int height, List<Player> players)
@@ -118,12 +122,12 @@ public partial class Map : Node2D
                 // bedrock edges
                 if (y == 0 || y == height - 1 || x == 0 || x == width - 1)
                 {
-                    CreateVisual(x, y, CellType.Bedrock);
+                    CreateCell(x, y, CellType.Bedrock);
                     continue;
                 }
                 if (y == 1 || y == height - 2 || x == 1 || x == width - 2)
                 {
-                    CreateVisual(x, y, CellType.Stone);
+                    CreateCell(x, y, CellType.Stone);
                     continue;
                 }
 
@@ -134,7 +138,7 @@ public partial class Map : Node2D
                 // create cell, if it's value is not none or empty
                 CellType cellType = LvlGenerator.OnlyDeposit(x, y);
                 if (cellType != CellType.None && cellType != CellType.Empty)
-                    CreateVisual(x, y, cellType);
+                    CreateCell(x, y, cellType);
 
             }
     }
@@ -154,37 +158,41 @@ public partial class Map : Node2D
         Position = new Vector2(xPos, yPos);
     }
 
-    public Cell CreateVisual(int x, int y, CellType cellType) => CreateVisual(new Pos(x, y), cellType);
-    public Cell CreateVisual(Pos pos, CellType cellType, int playerID = -1)
+    public Cell CreateCell(int x, int y, CellType cellType, int playerID = -1, GameAgent gameAgent = null) => CreateCell(new Pos(x, y), cellType, playerID, gameAgent);
+    public Cell CreateCell(Pos pos, CellType cellType, int playerID = -1, GameAgent gameAgent = null)
     {
         if (cellType is CellType.None or CellType.Empty)
-            throw new Exception("Can't create visual of type: " + (cellType.ToString()));
+            throw new Exception("Can't create visual of type: " + cellType.ToString());
         if (!IsEmpty(pos))
             throw new Exception("Pos already filled with visual: " + pos);
 
         bool isCreatingBot = cellType is CellType.FighterBot or CellType.MinerBot;
 
+        if (isCreatingBot && gameAgent is null)
+            throw new Exception("Bot is null, but cellType is: " + cellType.ToString());
+
         Node2D spriteTransform = CreateSprite(pos, cellType, playerID);
-        Cell cell = new Cell(pos, spriteTransform, cellType);
+        Cell cell = new Cell(pos, spriteTransform, cellType, gameAgent);
 
         if (isCreatingBot)
         {
             if (cellType is CellType.MinerBot)
-                SetMinerBotCell(pos, cell);
+                _minerBotMap[pos.X, pos.Y] = cell;
             else if (cellType is CellType.FighterBot)
-                SetFighterBotCell(pos, cell);
+                _fighterBotMap[pos.X, pos.Y] = cell;
         }
         else
-            SetCell(pos, cell);
+            _map[pos.X, pos.Y] = cell;
 
-
-        // add to BSPTree if mineral or deposit
+        // add cell to corosponsing BSPTree
         if (cellType == CellType.Deposit)
             depositBSPTree.Insert(cell);
         else if (cellType == CellType.Mineral)
-        {
             mineralBSPTree.Insert(cell);
-        }
+        else if (cellType == CellType.FighterBot)
+            fighterBSPTree.Insert(cell);
+        else if (cellType == CellType.MinerBot)
+            minerBSPTree.Insert(cell);
 
         return cell;
     }
@@ -263,27 +271,29 @@ public partial class Map : Node2D
 
     public void DestroyVisual(Pos pos)
     {
-        if (_map[pos.X, pos.Y] != null)
+        if (_map[pos.X, pos.Y] is not null)
         {
             Cell cellToBeDestroyed = _map[pos.X, pos.Y];
+            _map[pos.X, pos.Y] = null;
+
             cellToBeDestroyed.Destroy();
 
             // tell BSPTree that a cell has been destroyed
-            if (cellToBeDestroyed.CellType is CellType.Deposit)
+            switch (cellToBeDestroyed.CellType)
             {
-                depositBSPTree.IncrementDestroyedCells();
-                depositBSPTree.ReinsertAllAndCleanIfNeeded();
+                case CellType.Deposit:
+                    depositBSPTree.IncrementDestroyedCells();
+                    depositBSPTree.ReinsertAllAndCleanIfNeeded();
+                    break;
+                case CellType.Mineral:
+                    mineralBSPTree.IncrementDestroyedCells();
+                    mineralBSPTree.ReinsertAllAndCleanIfNeeded();
+                    break;
             }
-            else if (cellToBeDestroyed.CellType is CellType.Mineral)
-            {
-                mineralBSPTree.IncrementDestroyedCells();
-                mineralBSPTree.ReinsertAllAndCleanIfNeeded();
-            }
-
-            _map[pos.X, pos.Y] = null;
 
             return;
         }
+
         bool isFighterBot = _fighterBotMap[pos.X, pos.Y] is not null;
         bool isMinerBot = _minerBotMap[pos.X, pos.Y] is not null;
 
@@ -293,59 +303,73 @@ public partial class Map : Node2D
             explotionEffect.Position = pos.GetAsVector2();
             AddChild(explotionEffect);
 
-            // TODO DestroyVisual() currently removes both miners and fighters from position.
-            // it should only remove the one that is actually being destroyed, not both
-            if (isMinerBot)
+            // only destroy bot if it should be destroyed
+            if (isMinerBot && _minerBotMap[pos.X, pos.Y].gameAgent.ShouldBeDestroyed)
             {
                 _minerBotMap[pos.X, pos.Y].Destroy();
                 _minerBotMap[pos.X, pos.Y] = null;
             }
-            else if (isFighterBot)
+            else if (isFighterBot && _fighterBotMap[pos.X, pos.Y].gameAgent.ShouldBeDestroyed)
             {
                 _fighterBotMap[pos.X, pos.Y].Destroy();
                 _fighterBotMap[pos.X, pos.Y] = null;
             }
             return;
-
         }
 
         throw new Exception("Cell at " + pos + " is not filled!");
     }
 
-    public void SetCell(Pos pos, Cell cell) => _map[pos.X, pos.Y] = cell;
     public Cell GetCell(int x, int y) => _map[x, y];
     public Cell GetCell(Pos pos) => GetCell(pos.X, pos.Y);
-
-    public void SetMinerBotCell(Pos pos, Cell cell) => _minerBotMap[pos.X, pos.Y] = cell;
-    public void SetFighterBotCell(Pos pos, Cell cell) => _fighterBotMap[pos.X, pos.Y] = cell;
-    public Cell GetMinerBotCell(int x, int y) => _minerBotMap[x, y];
-    public Cell GetMinerBotCell(Pos pos) => GetMinerBotCell(pos.X, pos.Y);
-    public Cell GetFighterBotCell(int x, int y) => _fighterBotMap[x, y];
-    public Cell GetFighterBotCell(Pos pos) => GetFighterBotCell(pos.X, pos.Y);
-    public List<Pos> GetMineralPositions() => mineralBSPTree.GetPosList();
-    public List<Pos> GetDepositPositions() => depositBSPTree.GetPosList();
 
     public void MoveBotTo(Bot bot, Pos moveTarget)
     {
         Cell[,] botMap = bot.Type == BotType.MinerBot ? _minerBotMap : _fighterBotMap;
-
-        Pos botPos = bot.Pos;
-
-        Cell botCell = botMap[botPos.X, botPos.Y];
+        Cell botCell = botMap[bot.Pos.X, bot.Pos.Y];
         Cell moveTargetCell = botMap[moveTarget.X, moveTarget.Y];
 
         if (botCell is null)
-            throw new Exception("No bot found at bot position: " + botPos);
+            throw new Exception("No bot found at bot position: " + bot.Pos);
         if (moveTargetCell is not null)
             throw new Exception("Move target " + moveTarget + " is not empty! " +
                                 moveTargetCell.CellType.ToString());
         if (!bot.Pos.IsNextToOrEqual(moveTarget))
             throw new Exception("Move target " + moveTarget + " is not next to bot " + bot.Pos);
 
-        botMap[botPos.X, botPos.Y] = null;
-        botMap[moveTarget.X, moveTarget.Y] = botCell;
-        botCell.MoveTo(moveTarget);
+        if (bot.Type == BotType.MinerBot)
+            MoveMinerBotCell(botCell.GetPosition(), moveTarget);
+        else if (bot.Type == BotType.FighterBot)
+            MoveFighterBotCell(botCell.GetPosition(), moveTarget);
+
+        // botMap[bot.Pos.X, bot.Pos.Y] = null;
+        // botMap[moveTarget.X, moveTarget.Y] = botCell;
+        // botCell.MoveTo(moveTarget);
     }
+    private void MoveMinerBotCell(Pos fromPos, Pos toPos)
+    {
+        Cell cell = _minerBotMap[fromPos.X, fromPos.Y];
+        _minerBotMap[fromPos.X, fromPos.Y] = null;
+        _minerBotMap[toPos.X, toPos.Y] = cell;
+
+        cell.MoveTo(toPos);
+    }
+
+    private void MoveFighterBotCell(Pos fromPos, Pos toPos)
+    {
+        Cell cell = _fighterBotMap[fromPos.X, fromPos.Y];
+        _fighterBotMap[fromPos.X, fromPos.Y] = null;
+        _fighterBotMap[toPos.X, toPos.Y] = cell;
+
+        cell.MoveTo(toPos);
+    }
+
+    public Cell GetMinerBotCell(int x, int y) => _minerBotMap[x, y];
+    public Cell GetMinerBotCell(Pos pos) => GetMinerBotCell(pos.X, pos.Y);
+    public Cell GetFighterBotCell(int x, int y) => _fighterBotMap[x, y];
+    public Cell GetFighterBotCell(Pos pos) => GetFighterBotCell(pos.X, pos.Y);
+    public List<Pos> GetMineralPositions() => mineralBSPTree.GetPosList();
+    public List<Pos> GetDepositPositions() => depositBSPTree.GetPosList();
     public void Mine(Pos mineTarget)
     {
         CellType cellType = GetCell(mineTarget).CellType;
@@ -359,11 +383,9 @@ public partial class Map : Node2D
         Node2D minedEffect = minedPrefab.Instantiate() as Node2D;
         minedEffect.Position = mineTarget.GetAsVector2();
         AddChild(minedEffect);
-        // var minedEffect = Instantiate(minedPrefab, new Vector3(mineTarget.X, mineTarget.Y, 0),
-        //     Quaternion.identity, transform);
 
         if (cellType is CellType.Deposit)
-            CreateVisual(mineTarget, CellType.Mineral);
+            CreateCell(mineTarget, CellType.Mineral);
     }
     public void ClearMineral(Pos pos)
     {
@@ -399,7 +421,7 @@ public partial class Map : Node2D
         else
             cell = GetCell(pos);
 
-        if (cell == null)
+        if (cell is null)
             return cellType is CellType.Empty or CellType.None;
 
         return cell.CellType == cellType;
@@ -419,10 +441,10 @@ public partial class Map : Node2D
     public bool IsMineable(Pos pos) => IsMineable(pos.X, pos.Y);
     public bool IsMineable(int x, int y) => GetCell(x, y)?.CellType is CellType.Stone or CellType.Deposit;
 
-    public bool IsEmpty(int x, int y) => GetCell(x, y) == null && GetFighterBotCell(x, y) == null && GetMinerBotCell(x, y) == null;
+    public bool IsEmpty(int x, int y) => GetCell(x, y) is null && GetFighterBotCell(x, y) is null && GetMinerBotCell(x, y) is null;
     public bool IsEmpty(Pos pos) => IsEmpty(pos.X, pos.Y);
     public bool IsWalkable(Pos pos) => IsWalkable(pos.X, pos.Y);
-    public bool IsWalkable(int x, int y) => GetCell(x, y) == null || GetCell(x, y)?.CellType is CellType.Mineral;
+    public bool IsWalkable(int x, int y) => GetCell(x, y) is null || GetCell(x, y)?.CellType is CellType.Mineral;
     public bool IsBlocked(Pos pos, bool canMine = false) => IsBlocked(pos.X, pos.Y, canMine);
     public bool IsBlocked(int x, int y, bool canMine = false) => canMine ? !IsWalkable(x, y) && !IsMineable(x, y) : !IsWalkable(x, y);
     public bool IsSurrounded(Pos pos, bool canMine = false) => IsSurrounded(pos.X, pos.Y, canMine);

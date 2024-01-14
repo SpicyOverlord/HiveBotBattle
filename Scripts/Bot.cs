@@ -51,7 +51,7 @@ namespace HiveBotBattle.Scripts
         /// <param name="botID">The unique identifier of the bot.</param>
         /// <param name="type">The type of the bot.</param>
         /// <param name="startPosition">The starting position of the bot.</param>
-        public Bot(int playerID, int botID, BotType type, Pos startPosition) : base(playerID, type, startPosition,
+        public Bot(int playerID, int botID, AgentType type, Pos startPosition) : base(playerID, type, startPosition,
             MaxHealth)
         {
             BotID = botID;

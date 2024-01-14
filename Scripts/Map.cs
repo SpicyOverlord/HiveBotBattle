@@ -136,7 +136,7 @@ public partial class Map : Node2D
                     continue;
 
                 // create cell, if it's value is not none or empty
-                CellType cellType = LvlGenerator.OnlyDeposit(x, y);
+                CellType cellType = LvlGenerator.DiagonalLines(x, y);
                 if (cellType != CellType.None && cellType != CellType.Empty)
                     CreateCell(x, y, cellType);
 
@@ -325,7 +325,7 @@ public partial class Map : Node2D
 
     public void MoveBotTo(Bot bot, Pos moveTarget)
     {
-        Cell[,] botMap = bot.Type == BotType.MinerBot ? _minerBotMap : _fighterBotMap;
+        Cell[,] botMap = bot.Type == AgentType.MinerBot ? _minerBotMap : _fighterBotMap;
         Cell botCell = botMap[bot.Pos.X, bot.Pos.Y];
         Cell moveTargetCell = botMap[moveTarget.X, moveTarget.Y];
 
@@ -337,9 +337,9 @@ public partial class Map : Node2D
         if (!bot.Pos.IsNextToOrEqual(moveTarget))
             throw new Exception("Move target " + moveTarget + " is not next to bot " + bot.Pos);
 
-        if (bot.Type == BotType.MinerBot)
+        if (bot.Type == AgentType.MinerBot)
             MoveMinerBotCell(botCell.GetPosition(), moveTarget);
-        else if (bot.Type == BotType.FighterBot)
+        else if (bot.Type == AgentType.FighterBot)
             MoveFighterBotCell(botCell.GetPosition(), moveTarget);
 
         // botMap[bot.Pos.X, bot.Pos.Y] = null;
@@ -433,9 +433,9 @@ public partial class Map : Node2D
     public bool IsBedrock(Pos pos) => GetCell(pos)?.CellType == CellType.Bedrock;
     public bool IsMotherShip(Pos pos) => GetCell(pos)?.CellType == CellType.MotherShip;
     public bool IsMinerBot(Pos pos) => IsMinerBot(pos.X, pos.Y);
-    public bool IsMinerBot(int x, int y) => GetMinerBotCell(x, y)?.CellType is CellType.MinerBot;
+    public bool IsMinerBot(int x, int y) => GetMinerBotCell(x, y) is not null;
     public bool IsFighterBot(Pos pos) => IsFighterBot(pos.X, pos.Y);
-    public bool IsFighterBot(int x, int y) => GetFighterBotCell(x, y)?.CellType is CellType.FighterBot;
+    public bool IsFighterBot(int x, int y) => GetFighterBotCell(x, y) is not null;
 
     public bool IsShootable(Pos pos) => GetMinerBotCell(pos) is not null || GetFighterBotCell(pos) is not null || GetCell(pos)?.CellType is CellType.MotherShip;
     public bool IsMineable(Pos pos) => IsMineable(pos.X, pos.Y);

@@ -56,5 +56,9 @@ namespace HiveBotBattle.Scripts
         {
             return CellType.Deposit;
         }
+        public static CellType Empty(int x, int y)
+        {
+            return CellType.Empty;
+        }
     }
 }

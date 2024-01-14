@@ -14,7 +14,7 @@ namespace HiveMind
 
         private Pos _nearestEnemyFighterToBase;
 
-        public MotherShipMoveType MotherShipAI(MotherShipObservation obs)
+        public MotherShipMove MotherShipAI(MotherShipObservation obs)
         {
             Reset(obs);
 
@@ -33,14 +33,15 @@ namespace HiveMind
             }
 
 
-            if ((!_isOpenFight || !enemyFightersTooClose) && weShouldBuildMiner) return MotherShipMoveType.BuildMiner;
+            if ((!_isOpenFight || !enemyFightersTooClose) && weShouldBuildMiner) 
+                return new MotherShipMove(MotherShipMoveType.BuildMiner);
 
             // if (obs.GetEnemyCount() == 1)
             //     if (obs.GetFriendlyFighterBotCount() < obs.GetEnemyFighterBotCount())
             //         return MotherShipMoveType.BuildFighter;
             //     else
             //         return MotherShipMoveType.DoNothing;
-            return MotherShipMoveType.BuildFighter;
+            return new MotherShipMove(MotherShipMoveType.BuildFighter);
 
             // return MotherShipMoveType.DoNothing;
         }

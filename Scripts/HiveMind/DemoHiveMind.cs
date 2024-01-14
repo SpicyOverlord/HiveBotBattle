@@ -6,7 +6,7 @@ namespace HiveMind
 {
     public class DemoHiveMind : IHiveMind
     {
-        public MotherShipMoveType MotherShipAI(MotherShipObservation obs)
+        public MotherShipMove MotherShipAI(MotherShipObservation obs)
         {
             bool canBuildMinerBot = obs.GetStoredMinerals() >= obs.GetMinerBuildCost();
             bool canBuildFighterBot = obs.GetStoredMinerals() >= obs.GetFighterBuildCost();
@@ -15,15 +15,15 @@ namespace HiveMind
             if (obs.GetFriendlyMinerBotCount() < obs.GetMapWidth() / 5)
             {
                 if (canBuildMinerBot)
-                    return MotherShipMoveType.BuildMiner;
+                    return new MotherShipMove(MotherShipMoveType.BuildMiner);
 
-                return MotherShipMoveType.DoNothing;
+                return new MotherShipMove(MotherShipMoveType.DoNothing);
             }
 
             if (canBuildFighterBot)
-                return MotherShipMoveType.BuildFighter;
+                return new MotherShipMove(MotherShipMoveType.BuildFighter);
 
-            return MotherShipMoveType.DoNothing;
+            return new MotherShipMove(MotherShipMoveType.DoNothing);
         }
 
         public FighterBotMove FighterAI(BotObservation obs)

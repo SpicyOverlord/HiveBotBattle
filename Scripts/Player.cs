@@ -277,10 +277,10 @@ namespace HiveBotBattle.Scripts
 
             try
             {
-                MotherShipMoveType motherShipMove =
+                MotherShipMove motherShipMove =
                     HiveMind.MotherShipAI(new MotherShipObservation(gameController, fighterAccMap, this, MotherShip));
 
-                switch (motherShipMove)
+                switch (motherShipMove.Type)
                 {
                     case MotherShipMoveType.DoNothing:
                         break;

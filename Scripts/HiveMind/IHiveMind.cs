@@ -6,7 +6,7 @@ namespace HiveMind
 {
     public interface IHiveMind
     {
-        public MotherShipMoveType MotherShipAI(MotherShipObservation obs);
+        public MotherShipMove MotherShipAI(MotherShipObservation obs);
         public FighterBotMove FighterAI(BotObservation obs);
         public MinerBotMove MinerAI(BotObservation obs);
     }

@@ -7,12 +7,12 @@ namespace HiveMind
 {
     public class MinersOnly : IHiveMind
     {
-        public MotherShipMoveType MotherShipAI(MotherShipObservation obs)
+        public MotherShipMove MotherShipAI(MotherShipObservation obs)
         {
             if (obs.GetFriendlyMinerBotCount() <= 100 && obs.GetMinerBuildCost() <= obs.GetStoredMinerals()){
-                return MotherShipMoveType.BuildMiner;
+                return new MotherShipMove(MotherShipMoveType.BuildMiner);
             }
-            return MotherShipMoveType.DoNothing;
+            return new MotherShipMove(MotherShipMoveType.DoNothing);
         }
 
         public FighterBotMove FighterAI(BotObservation obs)

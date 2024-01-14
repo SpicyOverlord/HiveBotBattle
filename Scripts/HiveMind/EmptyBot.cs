@@ -6,9 +6,9 @@ namespace HiveMind
 {
     public class EmptyBot : IHiveMind
     {
-        public MotherShipMoveType MotherShipAI(MotherShipObservation obs)
+        public MotherShipMove MotherShipAI(MotherShipObservation obs)
         {
-            return MotherShipMoveType.DoNothing;
+            return new MotherShipMove(MotherShipMoveType.DoNothing);
         }
 
         public FighterBotMove FighterAI(BotObservation obs)

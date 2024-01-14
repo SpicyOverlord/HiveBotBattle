@@ -58,8 +58,8 @@ namespace HiveBotBattle.Scripts
             DestroyEverythingIfLost(map);
             if (HasLost) return;
 
-            PathFinder.AccessibilityMap MinerAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, BotType.MinerBot);
-            PathFinder.AccessibilityMap FighterAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, BotType.FighterBot);
+            PathFinder.AccessibilityMap MinerAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, AgentType.MinerBot);
+            PathFinder.AccessibilityMap FighterAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, AgentType.FighterBot);
 
 
             UpdateFighterBots(gameController, map, FighterAccMap);
@@ -103,7 +103,6 @@ namespace HiveBotBattle.Scripts
                         case FighterMoveType.Move:
                             if (!map.IsWalkable(fighterMove.TargetPos) || map.GetFighterBotCell(fighterMove.TargetPos) is not null)
                                 break;
-
                             map.MoveBotTo(fighterBot, fighterMove.TargetPos);
                             break;
                         case FighterMoveType.MoveTowards:
@@ -111,7 +110,7 @@ namespace HiveBotBattle.Scripts
                             Pos targetPos = fighterAccMap.FindClosestPos(fighterBot.Pos, fighterMove.TargetPos);
 
                             //find path
-                            Pos nextPos = PathFinder.FindPath(map, fighterBot.Pos, targetPos, BotType.FighterBot);
+                            Pos nextPos = PathFinder.FindPath(map, fighterBot.Pos, targetPos, AgentType.FighterBot);
 
                             // do nothing if the next position on the path is the pos we are on.
                             if (fighterBot.Pos.Equals(nextPos))
@@ -121,6 +120,7 @@ namespace HiveBotBattle.Scripts
                                 break;
 
                             map.MoveBotTo(fighterBot, nextPos);
+
                             break;
                         case FighterMoveType.Shoot:
                             if (map.IsShootable(fighterMove.TargetPos) &&
@@ -203,7 +203,7 @@ namespace HiveBotBattle.Scripts
                                 targetPos = minerAccMap.FindClosestPos(minerBot.Pos, minerMove.TargetPos);
 
                             //find path
-                            Pos nextPos = PathFinder.FindPath(map, minerBot.Pos, targetPos, BotType.MinerBot, canMine);
+                            Pos nextPos = PathFinder.FindPath(map, minerBot.Pos, targetPos, AgentType.MinerBot, canMine);
 
                             // do nothing if the next position on the path is the pos we are on.
                             if (minerBot.Pos.Equals(nextPos))
@@ -285,10 +285,10 @@ namespace HiveBotBattle.Scripts
                     case MotherShipMoveType.DoNothing:
                         break;
                     case MotherShipMoveType.BuildFighter:
-                        BuildBot(map, BotType.FighterBot, PlayerID);
+                        BuildBot(map, AgentType.FighterBot, PlayerID);
                         break;
                     case MotherShipMoveType.BuildMiner:
-                        BuildBot(map, BotType.MinerBot, PlayerID);
+                        BuildBot(map, AgentType.MinerBot, PlayerID);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -321,20 +321,20 @@ namespace HiveBotBattle.Scripts
             map.DestroyVisual(MotherShip.Pos);
         }
 
-        private void BuildBot(Map map, BotType botType, int playerID)
+        private void BuildBot(Map map, AgentType botType, int playerID)
         {
             // if we can't afford, do nothing
-            if (botType == BotType.FighterBot && GetCurrentFighterBuildCost() > StoredMinerals ||
-                botType == BotType.MinerBot && GetCurrentMinerBuildCost() > StoredMinerals) return;
+            if (botType == AgentType.FighterBot && GetCurrentFighterBuildCost() > StoredMinerals ||
+                botType == AgentType.MinerBot && GetCurrentMinerBuildCost() > StoredMinerals) return;
 
             Pos emptyNeighbor = map.GetFirstEmptyNeighbor(MotherShip.Pos);
             // if no empty neighbors, do nothing
             if (emptyNeighbor is null) return;
 
-            if (botType == BotType.FighterBot)
+            if (botType == AgentType.FighterBot)
             {
                 // create new fighter bot at empty neighbor
-                Bot newFighterBot = new Bot(PlayerID, _totalBuildFighterBots, BotType.FighterBot, emptyNeighbor);
+                Bot newFighterBot = new Bot(PlayerID, _totalBuildFighterBots, AgentType.FighterBot, emptyNeighbor);
                 _fighterBots.Add(newFighterBot);
                 // create visual
                 map.CreateCell(emptyNeighbor, CellType.FighterBot, playerID, newFighterBot);
@@ -342,10 +342,10 @@ namespace HiveBotBattle.Scripts
                 PayForFighterBot();
                 _totalBuildFighterBots++;
             }
-            else if (botType == BotType.MinerBot)
+            else if (botType == AgentType.MinerBot)
             {
                 // create new miner bot at empty neighbor
-                Bot newMinerBot = new Bot(PlayerID, _totalBuildMinerBots, BotType.MinerBot, emptyNeighbor);
+                Bot newMinerBot = new Bot(PlayerID, _totalBuildMinerBots, AgentType.MinerBot, emptyNeighbor);
                 _minerBots.Add(newMinerBot);
                 // create visual
                 map.CreateCell(emptyNeighbor, CellType.MinerBot, playerID, newMinerBot);

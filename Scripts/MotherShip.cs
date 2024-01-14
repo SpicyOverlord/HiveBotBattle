@@ -19,7 +19,7 @@ namespace HiveBotBattle.Scripts
         /// <param name="playerID">The ID of the player controlling the mother ship.</param>
         /// <param name="startPosition">The starting position of the mother ship.</param>
         public MotherShip(int playerID, Pos startPosition) :
-            base(playerID, BotType.MotherShip, startPosition, MaxHealth)
+            base(playerID, AgentType.MotherShip, startPosition, MaxHealth)
         { }
     }
 }

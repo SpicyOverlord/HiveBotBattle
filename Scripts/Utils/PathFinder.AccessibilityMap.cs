@@ -19,12 +19,12 @@ namespace Utils
             /// <param name="map">The map on which the accessibility map is based.</param>
             /// <param name="startPos">The starting position for the accessibility map.</param>
             /// <param name="botType">The type of bot for which the accessibility map is created.</param>
-            public AccessibilityMap(Map map, Pos startPos, BotType botType)
+            public AccessibilityMap(Map map, Pos startPos, AgentType botType)
             {
                 _map = map;
                 _boolMap = FloodFill(map, startPos);
-                isMinerBot = botType == BotType.MinerBot;
-                isFighterBot = botType == BotType.FighterBot;
+                isMinerBot = botType == AgentType.MinerBot;
+                isFighterBot = botType == AgentType.FighterBot;
             }
 
             /// <summary>

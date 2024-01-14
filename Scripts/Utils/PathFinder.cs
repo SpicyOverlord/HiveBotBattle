@@ -27,9 +27,9 @@ namespace Utils
         /// <param name="canMine">Optional. If true, the bot can mine through obstacles. Default is false.</param>
         /// <returns>The next position on the shortest path from the start position to the target position. If no path is found, returns the start position.</returns>
         /// <exception cref="Exception">Thrown if botType is not MinerBot or FighterBot, or if startPos or targetPos is null, or if the pathfinding takes too long.</exception>
-        public static Pos FindPath(Map map, Pos startPos, Pos targetPos, BotType botType, bool canMine = false)
+        public static Pos FindPath(Map map, Pos startPos, Pos targetPos, AgentType botType, bool canMine = false)
         {
-            if (botType is BotType.None or BotType.MotherShip)
+            if (botType is AgentType.None or AgentType.MotherShip)
                 throw new Exception("BotType is not miner or fighter!");
 
             bool isMinerBot = botType == BotType.MinerBot;
@@ -40,7 +40,7 @@ namespace Utils
             if (targetPos is null)
                 throw new Exception("target pos is null!");
 
-            bool targetIsBot = map.IsShootable(targetPos);
+            bool targetIsShootable = map.IsShootable(targetPos);
 
             PriorityQueue<PathNode, float> priorityQueue = new PriorityQueue<PathNode, float>(0);
             Dictionary<int, PathNode> pathNodeDictionary = new Dictionary<int, PathNode>();
@@ -59,7 +59,7 @@ namespace Utils
                 currentPathNode = priorityQueue.Dequeue();
                 pathNodesInQueue.Remove(currentPathNode.ID);
 
-                if (targetIsBot && targetPos.IsNextToOrEqual(currentPathNode.X,currentPathNode.Y) || targetPos.Equals(currentPathNode.X,currentPathNode.Y))
+                if (targetIsShootable && targetPos.IsNextToOrEqual(currentPathNode.X, currentPathNode.Y) || targetPos.Equals(currentPathNode.X, currentPathNode.Y))
                 {
                     // path found!
                     break;
@@ -93,12 +93,14 @@ namespace Utils
                             if (canMine)
                                 newDistance += 10;
                             else
+                            {
                                 newDistance += 4;
+                                // continue;
+                            }
                         }
 
-                        bool valueFound =
-                        pathNodeDictionary.TryGetValue(GenerateID(neighborX, neighborY), out PathNode newPathNode);
-                        if (!valueFound)
+                        bool pathNodeFound = pathNodeDictionary.TryGetValue(GenerateID(neighborX, neighborY), out PathNode newPathNode);
+                        if (!pathNodeFound)
                         {
                             newPathNode = new PathNode(neighborX, neighborY, currentPathNode, newDistance);
                             pathNodeDictionary.Add(newPathNode.ID, newPathNode);
@@ -140,9 +142,6 @@ namespace Utils
         /// <param name="startPos">The starting position for the accessibility map.</param>
         /// <param name="botType">The type of bot for which the accessibility map is generated.</param>
         /// <returns>The generated accessibility map.</returns>
-        public static AccessibilityMap GenerateAccessibilityMap(Map map, Pos startPos, BotType botType) => new AccessibilityMap(map, startPos, botType);
-
-
-
+        public static AccessibilityMap GenerateAccessibilityMap(Map map, Pos startPos, AgentType botType) => new AccessibilityMap(map, startPos, botType);
     }
 }

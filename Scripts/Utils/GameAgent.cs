@@ -21,7 +21,7 @@ namespace Utils
         /// <summary>
         /// The type of the GameAgent.
         /// </summary>
-        public readonly BotType Type;
+        public readonly AgentType Type;
 
         /// <summary>
         /// Indicates whether the GameAgent is destroyed.
@@ -40,7 +40,7 @@ namespace Utils
         /// <param name="botType">The type of the GameAgent.</param>
         /// <param name="startPos">The starting position of the GameAgent.</param>
         /// <param name="startHealth">The starting health of the GameAgent.</param>
-        protected GameAgent(int playerID, BotType botType, Pos startPos, int startHealth)
+        protected GameAgent(int playerID, AgentType botType, Pos startPos, int startHealth)
         {
             PlayerID = playerID;
             Type = botType;

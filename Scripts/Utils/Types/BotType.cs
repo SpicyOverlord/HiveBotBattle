@@ -1,6 +1,6 @@
 namespace HiveBotBattle.Scripts.Utils.Types
 {
-    public enum BotType
+    public enum AgentType
     {
         None,
         MinerBot,

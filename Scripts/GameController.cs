@@ -22,9 +22,9 @@ public partial class GameController : Node
     [Export]
     public int mapWidth = 50;
     [Export]
-    public int mapHeight = 25;
+    public int mapHeight = 50;
     [Export]
-    public int startMineralAmount = 1;
+    public int startMineralAmount = 3;
     [Export]
     public Godot.Collections.Array<Vector2> playerStartPositions;
     [Export]
@@ -113,6 +113,8 @@ public partial class GameController : Node
         foreach (Player player in Players)
         {
             player.TakeTurn(this);
+            Map.minerBSPTree.ReinsertAllAndClean();
+            Map.fighterBSPTree.ReinsertAllAndClean();
         }
 
         // check if the game is over only one player is left

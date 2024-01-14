@@ -1,3 +1,6 @@
+using System;
+using HiveBotBattle.Scripts.Utils.Types;
+
 public static class TypeExtensions
 {
     public static string ToString(this CellType cellType)

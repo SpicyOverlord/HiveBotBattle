@@ -7,17 +7,16 @@ using HiveMind;
 
 public class HiveMindCollector
 {
-    public static List<(string name,IHiveMind hiveMind)> CollectHiveMindAndNames()
+    public static List<(string name,Type hiveMindType)> CollectHiveMindAndNames()
     {
         Assembly assembly = Assembly.GetExecutingAssembly();
         IEnumerable<Type> types = assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IHiveMind)) && !t.IsAbstract);
 
-        List<(string name,IHiveMind hiveMind)> hiveMinds = new List<(string name,IHiveMind hiveMind)>();
+        List<(string name,Type hiveMindType)> hiveMinds = new List<(string name,Type hiveMindType)>();
         foreach (var type in types)
         {
             GD.Print("Found HiveMind: " + type.Name);
-            IHiveMind instance = (IHiveMind)Activator.CreateInstance(type);
-            hiveMinds.Add((name: type.Name, instance));
+            hiveMinds.Add((name: type.Name, hiveMindType: type));
         }
         return hiveMinds;
     }

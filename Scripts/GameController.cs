@@ -56,13 +56,14 @@ public partial class GameController : Node
 
     private void SetupPlayers()
     {
-        List<(string name, IHiveMind hiveMind)> hiveMinds = HiveMindCollector.CollectHiveMindAndNames();
+        List<(string name, Type hiveMindType)> hiveMinds = HiveMindCollector.CollectHiveMindAndNames();
 
         Players = new List<Player>();
         for (int i = 0; i < playerStartPositions.Count; i++)
         {
             string hiveMindName = hiveMinds[playerHiveMinds[i]].name;
-            IHiveMind hiveMind = hiveMinds[playerHiveMinds[i]].hiveMind;
+            Type hiveMindType = hiveMinds[playerHiveMinds[i]].hiveMindType;
+            IHiveMind hiveMind = (IHiveMind)Activator.CreateInstance(hiveMindType);
             GD.Print($"Player {i} is using {hiveMindName}");
 
             Vector2 startPos = playerStartPositions[i];

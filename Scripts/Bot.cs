@@ -9,7 +9,7 @@ namespace HiveBotBattle.Scripts
     /// </summary>
     public class Bot : GameAgent
     {
-        /// <summary>
+        /// <summary> 
         /// The amount of damage a bot can inflict.
         /// </summary>
         public const int DamageAmount = 10;
@@ -56,11 +56,9 @@ namespace HiveBotBattle.Scripts
         /// <param name="botID">The unique identifier of a bot.</param>
         /// <param name="type">The type of a bot.</param>
         /// <param name="startPosition">The starting position of a bot.</param>
-        public Bot(int playerID, int botID, AgentType type, Pos startPosition) : base(playerID, type, startPosition,
-            MaxHealth)
+        public Bot(int playerID, int botID, AgentType type, Pos startPosition) : base(playerID, type, startPosition, MaxHealth)
         {
             BotID = botID;
-            ShouldBeDestroyed = false;
         }
 
         /// <summary>

@@ -39,6 +39,9 @@ public partial class Map
 
         public void Destroy()
         {
+            CellNode.Position = new Vector2(-1000, -1000);
+            gameAgent?.Damage(99999);
+
             CellNode.QueueFree();
             _shouldBeDestroyed = true;
         }

@@ -125,6 +125,10 @@ namespace HiveBotBattle.Scripts
                             if (map.IsShootable(fighterMove.TargetPos) &&
                                 fighterBot.Pos.InShootingRangeOf(fighterMove.TargetPos))
                             {
+                                // check randomly if the bot is hit
+                                if (GD.Randi() % 100 < Bot.HitChange * 100)
+                                    break;
+
                                 GameAgent gameAgentToDamage = gameController.GetGameAgentAt(fighterMove.TargetPos);
                                 gameAgentToDamage.Damage();
                             }

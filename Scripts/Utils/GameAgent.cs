@@ -65,10 +65,6 @@ namespace Utils
         {
             if (ShouldBeDestroyed) return;
 
-            // check if the bot is hit
-            if (GD.Randi() % 100 < Bot.HitChange * 100)
-                return;
-
             Health -= damage;
             if (Health <= 0) ShouldBeDestroyed = true;
         }

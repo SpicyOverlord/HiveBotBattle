@@ -7,8 +7,13 @@ using HiveMind;
 
 public class HiveMindCollector
 {
+    /// <summary>
+    /// Collects the names and types of all available HiveMinds in the project.
+    /// </summary>
+    /// <returns>A list of tuples containing the name and type of each HiveMind.</returns>
     public static List<(string name,Type hiveMindType)> CollectHiveMindAndNames()
     {
+        
         Assembly assembly = Assembly.GetExecutingAssembly();
         IEnumerable<Type> types = assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IHiveMind)) && !t.IsAbstract);
 
@@ -20,4 +25,11 @@ public class HiveMindCollector
         }
         return hiveMinds;
     }
+
+
+    /// <summary>
+    /// Instantiate an implementation of IHiveMind from a given HiveMind type.
+    /// </summary>
+    public static IHiveMind InstantiateHiveMind(Type hiveMindType) => (IHiveMind)Activator.CreateInstance(hiveMindType);
+
 }

@@ -63,7 +63,7 @@ public partial class GameController : Node
         {
             string hiveMindName = hiveMinds[playerHiveMinds[i]].name;
             Type hiveMindType = hiveMinds[playerHiveMinds[i]].hiveMindType;
-            IHiveMind hiveMind = (IHiveMind)Activator.CreateInstance(hiveMindType);
+            IHiveMind hiveMind = HiveMindCollector.InstantiateHiveMind(hiveMindType);
             GD.Print($"Player {i} is using {hiveMindName}");
 
             Vector2 startPos = playerStartPositions[i];

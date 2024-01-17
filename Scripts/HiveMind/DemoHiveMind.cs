@@ -29,10 +29,10 @@ namespace HiveMind
 
         public FighterBotMove FighterAI(BotObservation obs)
         {
-            List<Pos> nearestFighterPos = obs.GetXNearestEnemyFighterBotPositions();
+            Pos nearestFighterPos = obs.GetNearestEnemyFighterBotPosition();
             // if a enemy Fighter is in range, shoot it
-            if (nearestFighterPos is not null && obs.GetBotPosition().InShootingRangeOf(nearestFighterPos[0]))
-                return new FighterBotMove(FighterMoveType.Shoot, nearestFighterPos[0]);
+            if (nearestFighterPos is not null && obs.GetBotPosition().InShootingRangeOf(nearestFighterPos))
+                return new FighterBotMove(FighterMoveType.Shoot, nearestFighterPos);
 
             Pos nearestEnemyMotherShip = obs.GetNearestEnemyMotherShipPosition();
             // if a enemy MotherShip is in range, shoot it
@@ -60,8 +60,8 @@ namespace HiveMind
                 return new MinerBotMove(MinerMoveType.MineTowards, motherShipPos);
             }
 
-            List<Pos> nearestMineral = obs.GetXNearestMineralPositions();
-            List<Pos> nearestDeposit = obs.GetXNearestDepositPositions();
+            Pos nearestMineral = obs.GetNearestMineralPosition();
+            Pos nearestDeposit = obs.GetNearestDepositPosition();
 
             // if there is nothing to mine, do nothing
             if (nearestMineral is null && nearestDeposit is null)
@@ -69,21 +69,21 @@ namespace HiveMind
 
             // move towards nearest deposit if there is no minerals in the map
             if (nearestMineral is null)
-                return new MinerBotMove(MinerMoveType.MineTowards, nearestDeposit[0]);
+                return new MinerBotMove(MinerMoveType.MineTowards, nearestDeposit);
 
             // move towards nearest mineral if there is no deposits in the map
             if (nearestDeposit is null)
-                return new MinerBotMove(MinerMoveType.MineTowards, nearestMineral[0]);
+                return new MinerBotMove(MinerMoveType.MineTowards, nearestMineral);
 
             // pick up mineral if bot is next to it
-            if (obs.IsNextTo(nearestMineral[0]))
-                return new MinerBotMove(MinerMoveType.PickUpMineral, nearestMineral[0]);
+            if (obs.IsNextTo(nearestMineral))
+                return new MinerBotMove(MinerMoveType.PickUpMineral, nearestMineral);
 
             // mine towards the nearest mineral, if it is closer than the nearest deposit
-            if (obs.DistanceTo(nearestMineral[0]) < obs.DistanceTo(nearestDeposit[0]))
-                return new MinerBotMove(MinerMoveType.MineTowards, nearestMineral[0]);
+            if (obs.DistanceTo(nearestMineral) < obs.DistanceTo(nearestDeposit))
+                return new MinerBotMove(MinerMoveType.MineTowards, nearestMineral);
             // else, mine towards the nearest deposit
-            return new MinerBotMove(MinerMoveType.MineTowards, nearestDeposit[0]);
+            return new MinerBotMove(MinerMoveType.MineTowards, nearestDeposit);
         }
     }
 }

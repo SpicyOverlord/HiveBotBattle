@@ -456,7 +456,12 @@ namespace HiveBotBattle.Scripts.BSPTree
                     Cell currentCell = CellArray.Get(currentElementIndex.Element);
                     currentIndex = currentElementIndex.Next;
 
-                    if (currentCell.IsDestroyed || !CellSelectorFunction(currentCell))
+                    // skip if cell content no longer exists
+                    if (currentCell.IsDestroyed)
+                        continue;
+
+                    // skip if cell is not wanted
+                    if (!CellSelectorFunction(currentCell))
                         continue;
 
                     float currentDistance = pos.DistanceToSquared(currentCell.GetPosition());
@@ -473,12 +478,14 @@ namespace HiveBotBattle.Scripts.BSPTree
             else
             {
                 float splitAxisPosValue = partition.SplitAlongXAxis ? pos.X : pos.Y;
+                float splitAxisDistance = Mathf.Pow(Mathf.Abs(splitAxisPosValue - partition.SplitValue), 2);
+
                 bool posIsInLeftChild = splitAxisPosValue <= partition.SplitValue;
 
                 Partition Child1Partition = _partitions[posIsInLeftChild ? partition.LeftChildIndex : partition.RightChildIndex];
                 FindXNearestPos(pos, Child1Partition, x, ref nearestCells, CellSelectorFunction);
 
-                if (nearestCells.Count < x || Math.Abs(splitAxisPosValue - partition.SplitValue) < Mathf.Sqrt(nearestCells.Last().distance))
+                if (nearestCells.Count < x || splitAxisDistance < nearestCells.Last().distance)
                 {
                     Partition Child2Partition = _partitions[posIsInLeftChild ? partition.RightChildIndex : partition.LeftChildIndex];
                     FindXNearestPos(pos, Child2Partition, x, ref nearestCells, CellSelectorFunction);

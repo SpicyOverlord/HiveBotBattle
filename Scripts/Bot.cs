@@ -10,52 +10,52 @@ namespace HiveBotBattle.Scripts
     public class Bot : GameAgent
     {
         /// <summary>
-        /// The amount of damage the bot can inflict.
+        /// The amount of damage a bot can inflict.
         /// </summary>
         public const int DamageAmount = 10;
 
         /// <summary>
-        /// The range at which the bot can shoot.
+        /// The range at which a bot can shoot.
         /// </summary>
         public const float ShootingRange = 2.85f;
 
         /// <summary>
-        /// The constant value representing the change for the bot is hit.
+        /// The constant value representing the change for a bot is hit.
         /// </summary>
         public const float HitChange = 0.75f;
 
         /// <summary>
-        /// The unique identifier of the bot.
+        /// The unique identifier of a bot.
         /// </summary>
         public readonly int BotID;
 
         /// <summary>
-        /// The maximum health of the bot.
+        /// The maximum health of a bot.
         /// </summary>
         public const int MaxHealth = 100;
 
         /// <summary>
-        /// The amount of health the bot can heal.
+        /// The amount of health a bot can heal.
         /// </summary>
         public const int HealAmount = 5;
 
         /// <summary>
-        /// The maximum number of minerals the bot can pick up.
+        /// The maximum number of minerals a bot can pick up.
         /// </summary>
         public const int MaxPickedUpMinerals = 3;
 
         /// <summary>
-        /// The number of minerals the bot has currently picked up.
+        /// The number of minerals a bot has currently picked up.
         /// </summary>
         public int PickedUpMinerals { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Bot"/> class.
         /// </summary>
-        /// <param name="playerID">The ID of the player controlling the bot.</param>
-        /// <param name="botID">The unique identifier of the bot.</param>
-        /// <param name="type">The type of the bot.</param>
-        /// <param name="startPosition">The starting position of the bot.</param>
+        /// <param name="playerID">The ID of the player controlling a bot.</param>
+        /// <param name="botID">The unique identifier of a bot.</param>
+        /// <param name="type">The type of a bot.</param>
+        /// <param name="startPosition">The starting position of a bot.</param>
         public Bot(int playerID, int botID, AgentType type, Pos startPosition) : base(playerID, type, startPosition,
             MaxHealth)
         {
@@ -64,7 +64,7 @@ namespace HiveBotBattle.Scripts
         }
 
         /// <summary>
-        /// Heals the bot by the specified amount.
+        /// Heals a bot by the specified amount.
         /// </summary>
         public void Heal()
         {
@@ -73,16 +73,16 @@ namespace HiveBotBattle.Scripts
         }
 
         /// <summary>
-        /// Determines whether the bot can pick up more minerals.
+        /// Determines whether a bot can pick up more minerals.
         /// </summary>
-        /// <returns><c>true</c> if the bot can pick up more minerals; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if a bot can pick up more minerals; otherwise, <c>false</c>.</returns>
         public bool CanPickUpMinerals() => PickedUpMinerals < MaxPickedUpMinerals;
 
         /// <summary>
-        /// Adds a mineral to the bot's inventory.
+        /// Adds a mineral to a bot's inventory.
         /// </summary>
         /// <returns><c>true</c> if the mineral was successfully added; otherwise, <c>false</c>.</returns>
-        /// <exception cref="Exception">Thrown when the bot cannot pick up more minerals.</exception>
+        /// <exception cref="Exception">Thrown when a bot cannot pick up more minerals.</exception>
         public bool AddMineral()
         {
             if (!CanPickUpMinerals()) throw new Exception("Can't pick up more Minerals");
@@ -91,7 +91,7 @@ namespace HiveBotBattle.Scripts
         }
 
         /// <summary>
-        /// Removes all the minerals picked up by the bot.
+        /// Removes all the minerals picked up by a bot.
         /// </summary>
         public void RemovePickedUpMinerals() => PickedUpMinerals = 0;
     }

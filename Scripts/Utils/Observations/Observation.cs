@@ -181,14 +181,16 @@ namespace Utils.Observations
         /// </summary>
         /// <returns>The nearest friendly fighter bot position. If there are no friendly fighter bots, returns null.</returns>
         public Pos GetNearestFriendlyFighterBotPosition() => _map.fighterBSPTree.FindNearestPos(GetBotPosition(), IsFriendly());
-        // public Pos GetNearestFriendlyFighterBotPosition() => GetNearestPosition(GetFriendlyFighterBotPositions());
+
+        public List<Pos> GetXNearestFriendlyFighterBotPositions(int x = 5) => _map.fighterBSPTree.FindXNearestPos(GetBotPosition(), x, IsFriendly());
 
         /// <summary>
         /// Gets the nearest friendly miner bot position.
         /// </summary>
         /// <returns>The nearest friendly miner bot position. If there are no friendly miner bots, returns null.</returns>
         public Pos GetNearestFriendlyMinerBotPosition() => _map.minerBSPTree.FindNearestPos(GetBotPosition(), IsFriendly());
-        // public Pos GetNearestFriendlyMinerBotPosition() => GetNearestPosition(GetFriendlyMinerBotPositions());
+
+        public List<Pos> GetXNearestFriendlyMinerBotPositions(int x = 5) => _map.minerBSPTree.FindXNearestPos(GetBotPosition(), x, IsFriendly());
 
 
         private Func<Cell, bool> IsFriendly() => c => c.gameAgent.PlayerID == GetPlayerID();
@@ -200,18 +202,21 @@ namespace Utils.Observations
         /// <returns>The nearest enemy fighter bot position. If there are no enemy fighter bots, returns null.</returns>
         public Pos GetNearestEnemyFighterBotPosition() => _map.fighterBSPTree.FindNearestPos(GetBotPosition(), IsEnemy());
 
-        // public Pos GetNearestEnemyFighterBotPosition() => GetNearestPosition(GetEnemyFighterBotPositions());
+        public List<Pos> GetXNearestEnemyFighterBotPositions(int x = 5) => _map.fighterBSPTree.FindXNearestPos(GetBotPosition(), x, IsEnemy());
 
         /// <summary>
         /// Gets the nearest enemy miner bot position.
         /// </summary>
         /// <returns>The nearest enemy miner bot position. If there are no enemy miner bots, returns null.</returns>
         public Pos GetNearestEnemyMinerBotPosition() => _map.minerBSPTree.FindNearestPos(GetBotPosition(), IsEnemy());
-        // public Pos GetNearestEnemyMinerBotPosition() => GetNearestPosition(GetEnemyMinerBotPositions());
 
-        // private List<Pos> GetPositionsInShootingRange(List<Pos> botList) => botList.Where(pos => _gameAgent.Pos.InShootingRangeOf(pos))
-        //         .Select(pos => pos.Clone()).ToList();
+        public List<Pos> GetXNearestEnemyMinerBotPositions(int x = 5) => _map.minerBSPTree.FindXNearestPos(GetBotPosition(), x, IsEnemy());
 
+
+        /// <summary>
+        /// Gets the positions of enemy fighters bots in shooting range.
+        /// </summary>
+        /// <returns>A list of positions of enemy miner bots in shooting range.</returns>
         public List<Pos> GetEnemyFighterBotsInShootingRange() => _map.fighterBSPTree.FindPosInShootingRange(GetBotPosition(), IsEnemy());
 
         /// <summary>
@@ -280,11 +285,15 @@ namespace Utils.Observations
         /// <returns>The nearest position of a mineral. If there are no minerals, returns null.</returns>
         public Pos GetNearestMineralPosition() => _map.mineralBSPTree.FindNearestPos(GetBotPosition());
 
+        public List<Pos> GetXNearestMineralPositions(int x = 5) => _map.mineralBSPTree.FindXNearestPos(GetBotPosition(), x);
+
         /// <summary>
         /// Gets the nearest deposit's position.
         /// </summary>
         /// <returns>The nearest position of a deposit. If there are no deposits, returns null.</returns>
         public Pos GetNearestDepositPosition() => _map.depositBSPTree.FindNearestPos(GetBotPosition());
+
+        public List<Pos> GetXNearestDepositPositions(int x = 5) => _map.depositBSPTree.FindXNearestPos(GetBotPosition(), x);
 
         /// <summary>
         /// Gets the width of the map.

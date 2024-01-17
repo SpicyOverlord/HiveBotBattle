@@ -374,7 +374,6 @@ namespace HiveBotBattle.Scripts.BSPTree
                     if (currentCell.IsDestroyed)
                         continue;
 
-
                     // skip if cell is not wanted
                     if (!CellSelectorFunction(currentCell))
                         continue;
@@ -417,6 +416,77 @@ namespace HiveBotBattle.Scripts.BSPTree
 
             return nearestPosInChild1;
         }
+
+
+        /// <summary>
+        /// Finds the nearest X positions to a given position in the BSP tree.
+        /// </summary>
+        /// <param name="pos">The position to find the nearest X positions for.</param>
+        /// <param name="x">The number of nearest positions to find.</param>
+        /// <param name="CellSelectorFunction">Optional selector function to filter cells.</param>
+        /// <returns>A sorted list of the nearest X positions.</returns>
+        public List<Pos> FindXNearestPos(Pos pos, int x = 5, Func<Cell, bool> CellSelectorFunction = null)
+        {
+            var nearestCells = new List<(Cell cell, float distance)>();
+            FindXNearestPos(pos, _partitions[0], x, ref nearestCells, CellSelectorFunction);
+
+            if (nearestCells.Count == 0)
+                return null;
+            
+            nearestCells.Sort((a, b) => a.distance.CompareTo(b.distance));
+            return nearestCells.Select(c => c.cell.GetPosition()).ToList();
+        }
+
+        private void FindXNearestPos(Pos pos, Partition partition, int x, ref List<(Cell cell, float distance)> nearestCells, Func<Cell, bool> CellSelectorFunction = null)
+        {
+            if (CellArray.Count == 0)
+                return;
+
+            CellSelectorFunction ??= c => true;
+
+            if (partition.IsLeafNode)
+            {
+                if (partition.FirstElementIndex == Empty)
+                    return;
+
+                int currentIndex = partition.FirstElementIndex;
+                while (currentIndex != Null)
+                {
+                    ElementIndex currentElementIndex = ElementIndices[currentIndex];
+                    Cell currentCell = CellArray.Get(currentElementIndex.Element);
+                    currentIndex = currentElementIndex.Next;
+
+                    if (currentCell.IsDestroyed || !CellSelectorFunction(currentCell))
+                        continue;
+
+                    float currentDistance = pos.DistanceToSquared(currentCell.GetPosition());
+                    if (nearestCells.Count < x || currentDistance < nearestCells.Last().distance)
+                    {
+                        nearestCells.Add((currentCell, currentDistance));
+                        nearestCells.Sort((a, b) => a.distance.CompareTo(b.distance));
+
+                        if (nearestCells.Count > x)
+                            nearestCells.RemoveAt(nearestCells.Count - 1);
+                    }
+                }
+            }
+            else
+            {
+                float splitAxisPosValue = partition.SplitAlongXAxis ? pos.X : pos.Y;
+                bool posIsInLeftChild = splitAxisPosValue <= partition.SplitValue;
+
+                Partition Child1Partition = _partitions[posIsInLeftChild ? partition.LeftChildIndex : partition.RightChildIndex];
+                FindXNearestPos(pos, Child1Partition, x, ref nearestCells, CellSelectorFunction);
+
+                if (nearestCells.Count < x || Math.Abs(splitAxisPosValue - partition.SplitValue) < Mathf.Sqrt(nearestCells.Last().distance))
+                {
+                    Partition Child2Partition = _partitions[posIsInLeftChild ? partition.RightChildIndex : partition.LeftChildIndex];
+                    FindXNearestPos(pos, Child2Partition, x, ref nearestCells, CellSelectorFunction);
+                }
+            }
+        }
+
+
 
         public List<Pos> GetPosList() => CellArray.ToStandardArray().Select(c => c.GetPosition()).ToList();
     }

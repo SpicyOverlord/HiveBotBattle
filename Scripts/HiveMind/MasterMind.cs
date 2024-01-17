@@ -59,7 +59,7 @@ namespace HiveMind
             List<Pos> enemyFighterPosList = obs.GetEnemyFighterBotsInShootingRange();
             foreach (Pos enemyFighterPos in enemyFighterPosList)
                 if (_knownFightTargets.Contains(enemyFighterPos) &&
-                    obs.GetCellType(enemyFighterPos) == CellType.FighterBot)
+                    obs.GetTypeAt(enemyFighterPos) == CellType.FighterBot)
                 {
                     target = enemyFighterPos;
                     break;

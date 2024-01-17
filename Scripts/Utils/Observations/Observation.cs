@@ -76,7 +76,10 @@ namespace Utils.Observations
 
         private Map.Cell GetCell(Pos pos) => _map.GetCell(pos);
 
-        public CellType GetCellType(Pos pos) => GetCell(pos)?.CellType ?? _map.GetMinerBotCell(pos)?.CellType ?? _map.GetFighterBotCell(pos)?.CellType ?? CellType.Empty;
+        /// <summary>
+        /// returns the type at the specified position in the map.
+        /// </summary>
+        public CellType GetTypeAt(Pos pos) => GetCell(pos)?.CellType ?? _map.GetFighterBotCell(pos)?.CellType ?? _map.GetMinerBotCell(pos)?.CellType ?? CellType.Empty;
 
         /// <summary>
         /// Checks if the specified position is of the specified cell type.
@@ -182,6 +185,11 @@ namespace Utils.Observations
         /// <returns>The nearest friendly fighter bot position. If there are no friendly fighter bots, returns null.</returns>
         public Pos GetNearestFriendlyFighterBotPosition() => _map.fighterBSPTree.FindNearestPos(GetBotPosition(), IsFriendly());
 
+        /// <summary>
+        /// Returns a list of the X nearest friendly fighter bots positions to the bot's current position.
+        /// </summary>
+        /// <param name="x">The number of nearest positions to retrieve (default is 5).</param>
+        /// <returns>A list of the X nearest deposit positions.</returns>
         public List<Pos> GetXNearestFriendlyFighterBotPositions(int x = 5) => _map.fighterBSPTree.FindXNearestPos(GetBotPosition(), x, IsFriendly());
 
         /// <summary>
@@ -190,6 +198,11 @@ namespace Utils.Observations
         /// <returns>The nearest friendly miner bot position. If there are no friendly miner bots, returns null.</returns>
         public Pos GetNearestFriendlyMinerBotPosition() => _map.minerBSPTree.FindNearestPos(GetBotPosition(), IsFriendly());
 
+        /// <summary>
+        /// Returns a list of the X nearest friendly miner bots positions to the bot's current position.
+        /// </summary>
+        /// <param name="x">The number of nearest positions to retrieve (default is 5).</param>
+        /// <returns>A list of the X nearest deposit positions.</returns>
         public List<Pos> GetXNearestFriendlyMinerBotPositions(int x = 5) => _map.minerBSPTree.FindXNearestPos(GetBotPosition(), x, IsFriendly());
 
 
@@ -202,6 +215,11 @@ namespace Utils.Observations
         /// <returns>The nearest enemy fighter bot position. If there are no enemy fighter bots, returns null.</returns>
         public Pos GetNearestEnemyFighterBotPosition() => _map.fighterBSPTree.FindNearestPos(GetBotPosition(), IsEnemy());
 
+        /// <summary>
+        /// Returns a list of the X nearest enemy fighter bots positions to the bot's current position.
+        /// </summary>
+        /// <param name="x">The number of nearest positions to retrieve (default is 5).</param>
+        /// <returns>A list of the X nearest enemy fighter bots positions.</returns>
         public List<Pos> GetXNearestEnemyFighterBotPositions(int x = 5) => _map.fighterBSPTree.FindXNearestPos(GetBotPosition(), x, IsEnemy());
 
         /// <summary>
@@ -210,6 +228,11 @@ namespace Utils.Observations
         /// <returns>The nearest enemy miner bot position. If there are no enemy miner bots, returns null.</returns>
         public Pos GetNearestEnemyMinerBotPosition() => _map.minerBSPTree.FindNearestPos(GetBotPosition(), IsEnemy());
 
+        /// <summary>
+        /// Returns a list of the X nearest enemy miner bots positions to the bot's current position.
+        /// </summary>
+        /// <param name="x">The number of nearest positions to retrieve (default is 5).</param>
+        /// <returns>A list of the X nearest enemy miner bots positions.</returns>
         public List<Pos> GetXNearestEnemyMinerBotPositions(int x = 5) => _map.minerBSPTree.FindXNearestPos(GetBotPosition(), x, IsEnemy());
 
 
@@ -285,6 +308,11 @@ namespace Utils.Observations
         /// <returns>The nearest position of a mineral. If there are no minerals, returns null.</returns>
         public Pos GetNearestMineralPosition() => _map.mineralBSPTree.FindNearestPos(GetBotPosition());
 
+        /// <summary>
+        /// Returns a list of the X nearest mineral positions to the bot's current position.
+        /// </summary>
+        /// <param name="x">The number of nearest positions to retrieve (default is 5).</param>
+        /// <returns>A list of the X nearest mineral positions.</returns>
         public List<Pos> GetXNearestMineralPositions(int x = 5) => _map.mineralBSPTree.FindXNearestPos(GetBotPosition(), x);
 
         /// <summary>
@@ -293,6 +321,11 @@ namespace Utils.Observations
         /// <returns>The nearest position of a deposit. If there are no deposits, returns null.</returns>
         public Pos GetNearestDepositPosition() => _map.depositBSPTree.FindNearestPos(GetBotPosition());
 
+        /// <summary>
+        /// Returns a list of the X nearest deposit positions to the bot's current position.
+        /// </summary>
+        /// <param name="x">The number of nearest positions to retrieve (default is 5).</param>
+        /// <returns>A list of the X nearest deposit positions.</returns>
         public List<Pos> GetXNearestDepositPositions(int x = 5) => _map.depositBSPTree.FindXNearestPos(GetBotPosition(), x);
 
         /// <summary>

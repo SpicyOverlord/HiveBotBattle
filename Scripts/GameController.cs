@@ -28,7 +28,7 @@ public partial class GameController : Node
     [Export]
     public Godot.Collections.Array<Vector2> playerStartPositions;
     [Export]
-    public Godot.Collections.Array<HiveMindType> playerHiveMinds;
+    public Godot.Collections.Array<int> playerHiveMinds;
 
     private int _currentPlayerIndex;
     private float _nextUpdateTime = -1;
@@ -56,10 +56,14 @@ public partial class GameController : Node
 
     private void SetupPlayers()
     {
+        List<(string name, IHiveMind hiveMind)> hiveMinds = HiveMindCollector.CollectHiveMindAndNames();
+
         Players = new List<Player>();
         for (int i = 0; i < playerStartPositions.Count; i++)
         {
-            IHiveMind playerHiveMind = HiveMindTypeToHiveMind(playerHiveMinds[i]);
+            string hiveMindName = hiveMinds[playerHiveMinds[i]].name;
+            IHiveMind hiveMind = hiveMinds[playerHiveMinds[i]].hiveMind;
+            GD.Print($"Player {i} is using {hiveMindName}");
 
             Vector2 startPos = playerStartPositions[i];
 
@@ -68,7 +72,7 @@ public partial class GameController : Node
             if (startPos.Y < 0)
                 startPos.Y += mapHeight - 1;
 
-            Players.Add(new Player(i, playerHiveMind, new Pos((int)startPos.X, (int)startPos.Y), startMineralAmount));
+            Players.Add(new Player(i, hiveMindName, hiveMind, new Pos((int)startPos.X, (int)startPos.Y), startMineralAmount));
         }
     }
 
@@ -123,19 +127,6 @@ public partial class GameController : Node
             GD.Print($"Player {Players.First().PlayerID} has Won the game!!!");
             return;
         }
-    }
-
-    public static IHiveMind HiveMindTypeToHiveMind(HiveMindType HiveMindType)
-    {
-        return HiveMindType switch
-        {
-            HiveMindType.Demo => new DemoHiveMind(),
-            HiveMindType.MasterMind => new MasterMind(),
-            HiveMindType.TestBot => new MinerBot(),
-            HiveMindType.MinersOnly => new MinersOnly(),
-            HiveMindType.EmptyBot => new EmptyBot(),
-            _ => throw new ArgumentOutOfRangeException()
-        };
     }
 
     public GameAgent GetGameAgentAt(Pos pos)

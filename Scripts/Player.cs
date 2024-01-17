@@ -15,6 +15,7 @@ namespace HiveBotBattle.Scripts
         private const bool SuppressErrors = false;
 
         public readonly int PlayerID;
+        public readonly string Name;
 
         public readonly IHiveMind HiveMind;
 
@@ -27,9 +28,10 @@ namespace HiveBotBattle.Scripts
 
         public bool HasLost { get; private set; }
 
-        public Player(int playerID, IHiveMind hiveMind, Pos startPosition, int startMinerals)
+        public Player(int playerID, string name, IHiveMind hiveMind, Pos startPosition, int startMinerals)
         {
             PlayerID = playerID;
+            Name = name;
             HiveMind = hiveMind;
             MotherShip = new MotherShip(PlayerID, startPosition);
 
@@ -61,11 +63,8 @@ namespace HiveBotBattle.Scripts
             PathFinder.AccessibilityMap MinerAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, AgentType.MinerBot);
             PathFinder.AccessibilityMap FighterAccMap = PathFinder.GenerateAccessibilityMap(map, MotherShip.Pos, AgentType.FighterBot);
 
-
             UpdateFighterBots(gameController, map, FighterAccMap);
-
             UpdateMinerBot(gameController, map, MinerAccMap);
-
             UpdateMotherShip(gameController, map, FighterAccMap);
         }
 
@@ -89,8 +88,8 @@ namespace HiveBotBattle.Scripts
 
                 try
                 {
-                    FighterBotMove fighterMove =
-                        HiveMind.FighterAI(new BotObservation(gameController, fighterAccMap, this, fighterBot));
+                    BotObservation fighterBotObservation = new BotObservation(gameController, fighterAccMap, this, fighterBot);
+                    FighterBotMove fighterMove = HiveMind.FighterAI(fighterBotObservation);
 
                     if (fighterMove.Type is not (FighterMoveType.DoNothing or FighterMoveType.Heal) &&
                         fighterMove.TargetPos is null)
@@ -176,7 +175,8 @@ namespace HiveBotBattle.Scripts
 
                 try
                 {
-                    MinerBotMove minerMove = HiveMind.MinerAI(new BotObservation(gameController, minerAccMap, this, minerBot));
+                    BotObservation minerBotObservation = new BotObservation(gameController, minerAccMap, this, minerBot);
+                    MinerBotMove minerMove = HiveMind.MinerAI(minerBotObservation);
 
                     if (minerMove.Type is not (MinerMoveType.DoNothing or MinerMoveType.Heal) &&
                         minerMove.TargetPos is null)
@@ -277,8 +277,8 @@ namespace HiveBotBattle.Scripts
 
             try
             {
-                MotherShipMove motherShipMove =
-                    HiveMind.MotherShipAI(new MotherShipObservation(gameController, fighterAccMap, this, MotherShip));
+                MotherShipObservation motherShipObservation = new MotherShipObservation(gameController, fighterAccMap, this, MotherShip);
+                MotherShipMove motherShipMove = HiveMind.MotherShipAI(motherShipObservation);
 
                 switch (motherShipMove.Type)
                 {

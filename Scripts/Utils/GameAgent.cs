@@ -1,3 +1,5 @@
+using System;
+using Godot;
 using HiveBotBattle.Scripts;
 using HiveBotBattle.Scripts.Utils.Types;
 
@@ -62,6 +64,10 @@ namespace Utils
         public void Damage(int damage = Bot.DamageAmount)
         {
             if (ShouldBeDestroyed) return;
+
+            // check if the bot is hit
+            if (GD.Randi() % 100 < Bot.HitChange * 100)
+                return;
 
             Health -= damage;
             if (Health <= 0) ShouldBeDestroyed = true;

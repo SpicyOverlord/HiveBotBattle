@@ -20,6 +20,11 @@ namespace HiveBotBattle.Scripts
         public const float ShootingRange = 2.85f;
 
         /// <summary>
+        /// The constant value representing the change for the bot is hit.
+        /// </summary>
+        public const float HitChange = 0.75f;
+
+        /// <summary>
         /// The unique identifier of the bot.
         /// </summary>
         public readonly int BotID;

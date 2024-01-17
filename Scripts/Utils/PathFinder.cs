@@ -85,8 +85,6 @@ namespace Utils
                             newDistance += 1;
                         }
 
-                        //TODO THIS DOESN'T WORK
-                        // go around bots if possible, else try walking though them (basically stand still as this is not possible)
                         else if (isMinerBot && map.IsMinerBot(neighborX, neighborY) || isFighterBot && map.IsFighterBot(neighborX, neighborY))
                         {
                             // higher value for canMine, as we probably can mine around bot.

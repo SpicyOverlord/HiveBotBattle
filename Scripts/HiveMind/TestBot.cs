@@ -4,7 +4,7 @@ using Utils.Observations;
 
 namespace HiveMind
 {
-    public class MinerBot : IHiveMind
+    public class TestBot : IHiveMind
     {
         public MotherShipMove MotherShipAI(MotherShipObservation obs)
         {
